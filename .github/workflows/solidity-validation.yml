@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: alpha-solidity-${{ github.event.pull_request.number || github.ref }}
@@ -19,22 +19,14 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
-        with:
-          ref: ${{ github.head_ref || github.ref_name }}
 
       - uses: actions/setup-node@v7
         with:
           node-version: '22.16.0'
+          cache: npm
 
-      - name: Install dependencies
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [ -f package-lock.json ]; then
-            npm ci --no-audit --no-fund
-          else
-            npm install --no-audit --no-fund
-          fi
+      - name: Reproducible install
+        run: npm ci --no-audit --no-fund
 
       - name: Validate source and configuration invariants
         run: npm run guard
@@ -47,19 +39,3 @@ jobs:
 
       - name: Deploy ALPHA to ephemeral local network
         run: npm run deploy:local
-
-      - name: Commit generated lockfile once
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
-        shell: bash
-        run: |
-          set -euo pipefail
-          if git ls-tree -r HEAD --name-only | grep -qx 'package-lock.json'; then
-            echo 'package-lock.json is already versioned.'
-            exit 0
-          fi
-          test -s package-lock.json
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add package-lock.json
-          git commit -m 'chore: lock ALPHA dependencies'
-          git push origin HEAD:"${GITHUB_HEAD_REF}"
