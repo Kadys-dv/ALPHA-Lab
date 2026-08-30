@@ -1,0 +1,23 @@
+{
+  "name": "alpha-token-lab",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Projeto educacional ERC-20 ALPHA para estudo em Hardhat 3 e Base Sepolia.",
+  "scripts": {
+    "build": "hardhat build",
+    "test": "hardhat test solidity",
+    "test:all": "hardhat test",
+    "node": "hardhat node",
+    "deploy:local": "hardhat ignition deploy ignition/modules/AlphaToken.ts",
+    "deploy:base-sepolia": "hardhat ignition deploy ignition/modules/AlphaToken.ts --network baseSepolia"
+  },
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox-viem": "5.0.7",
+    "@openzeppelin/contracts": "5.6.1",
+    "hardhat": "3.15.0"
+  }
+}
