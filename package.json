@@ -5,12 +5,14 @@
   "type": "module",
   "description": "Projeto educacional ERC-20 ALPHA para estudo em Hardhat 3 e Base Sepolia.",
   "scripts": {
+    "guard": "node scripts/source-guard.mjs",
     "build": "hardhat build",
     "test": "hardhat test solidity",
     "test:all": "hardhat test",
     "node": "hardhat node",
     "deploy:local": "hardhat ignition deploy ignition/modules/AlphaToken.ts",
-    "deploy:base-sepolia": "hardhat ignition deploy ignition/modules/AlphaToken.ts --network baseSepolia"
+    "deploy:base-sepolia": "hardhat ignition deploy ignition/modules/AlphaToken.ts --network baseSepolia",
+    "validate": "npm run guard && npm run build && npm test && npm run deploy:local"
   },
   "engines": {
     "node": ">=22.13.0"
