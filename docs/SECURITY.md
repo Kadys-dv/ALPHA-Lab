@@ -1,0 +1,17 @@
+# Segurança do ALPHA Lab
+
+Este projeto é educacional e não substitui auditoria profissional.
+
+## Regras adotadas
+
+1. Nunca versionar chave privada ou seed phrase.
+2. Usar uma carteira exclusiva para testnet.
+3. Não enviar fundos reais para a carteira de testes.
+4. Usar o Hardhat Keystore para a chave de deploy.
+5. O contrato não possui mint administrativo, taxa, blacklist, pause ou proxy.
+6. Testar localmente antes de Base Sepolia.
+7. Confirmar sempre que a rede selecionada é Base Sepolia (chain ID 84532) antes do deploy.
+
+## Se um dia houver mainnet
+
+Criar uma revisão específica antes de qualquer deploy. A existência deste protótipo não significa que esteja aprovado para receber dinheiro real ou ser tratado como investimento.
