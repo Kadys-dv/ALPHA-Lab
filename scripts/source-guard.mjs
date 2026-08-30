@@ -35,6 +35,12 @@ const checks = [
     "Base Sepolia key via config variable",
     /configVariable\("BASE_SEPOLIA_PRIVATE_KEY"\)/.test(config),
   ],
+  [
+    "No Base mainnet deployment target",
+    !/chainId:\s*8453\b/.test(config) &&
+      !/mainnet\.base\.org/.test(config) &&
+      !/baseMainnet|base_mainnet/i.test(config),
+  ],
   ["Ignition deploys AlphaToken", /m\.contract\("AlphaToken"\)/.test(ignition)],
   ["Hardhat pinned 3.15.0", pkg.devDependencies?.hardhat === "3.15.0"],
   [

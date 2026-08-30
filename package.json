@@ -11,7 +11,9 @@
     "test:all": "hardhat test",
     "node": "hardhat node",
     "deploy:local": "hardhat ignition deploy ignition/modules/AlphaToken.ts",
+    "preflight:base-sepolia": "node scripts/base-sepolia-preflight.mjs",
     "deploy:base-sepolia": "hardhat ignition deploy ignition/modules/AlphaToken.ts --network baseSepolia",
+    "verify:base-sepolia": "node scripts/verify-alpha-base-sepolia.mjs",
     "validate": "npm run guard && npm run build && npm test && npm run deploy:local"
   },
   "engines": {
