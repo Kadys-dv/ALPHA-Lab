@@ -1,0 +1,41 @@
+name: Solidity Validation
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: alpha-solidity-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+          cache: npm
+
+      - name: Reproducible install
+        run: npm ci --no-audit --no-fund
+
+      - name: Validate source and configuration invariants
+        run: npm run guard
+
+      - name: Compile Solidity 0.8.34
+        run: npm run build
+
+      - name: Run Solidity tests
+        run: npm test
+
+      - name: Deploy ALPHA to ephemeral local network
+        run: npm run deploy:local
