@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { ArrowUpRight, Wallet } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { buildIssueUrl, isEvmAddress, normalizeGitHubEvidenceUrl } from "@/lib/validation";
@@ -9,7 +8,6 @@ type Props = {
   account: string;
   onCorrectNetwork: boolean;
   connect: () => Promise<void>;
-  reducedMotion: boolean;
   exampleBuilderIssue?: number;
 };
 
@@ -20,7 +18,6 @@ export default function SubmissionSection({
   account,
   onCorrectNetwork,
   connect,
-  reducedMotion,
   exampleBuilderIssue,
 }: Props) {
   const [repoUrl, setRepoUrl] = useState("");
@@ -59,14 +56,7 @@ export default function SubmissionSection({
   };
 
   return (
-    <motion.section
-      className="submission-section section-shell"
-      id="submit"
-      initial={reducedMotion ? undefined : { opacity: 0, y: 24 }}
-      whileInView={reducedMotion ? undefined : { opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.18 }}
-      transition={{ duration: 0.55 }}
-    >
+    <section className="submission-section section-shell" id="submit">
       <div className="submission-intro">
         <div className="section-kicker">ENVIAR CONTRIBUIÇÃO</div>
         <h2>Sua evidência começa com um link público.</h2>
@@ -158,6 +148,6 @@ export default function SubmissionSection({
           Nunca envie seed phrase, chave privada ou dados pessoais sensíveis.
         </small>
       </form>
-    </motion.section>
+    </section>
   );
 }
