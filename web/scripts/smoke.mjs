@@ -17,7 +17,13 @@ for (let attempt = 1; attempt <= attempts; attempt += 1) {
 if (!response?.ok) throw lastError ?? new Error("Site did not become ready");
 
 const html = await response.text();
-for (const marker of ["ALPHA", "Base Sepolia"]) {
+for (const marker of [
+  "ALPHA",
+  "Base Sepolia",
+  "Aprenda construindo.",
+  "Pular para o conteúdo",
+  "URL pública do repositório ou Pull Request",
+]) {
   if (!html.includes(marker)) throw new Error(`Missing marker: ${marker}`);
 }
 for (const marker of ["Base Mainnet", "Comprar ALPHA", "Swap ALPHA", "Stake ALPHA"]) {
@@ -28,7 +34,28 @@ const versionResponse = await fetch(new URL("/api/version", url));
 if (!versionResponse.ok) throw new Error(`/api/version returned ${versionResponse.status}`);
 const version = await versionResponse.json();
 if (version.chainId !== 84532) throw new Error("Unexpected Chain ID in version endpoint");
-if (version.contract !== "0xff15343aCcc4B77479EBE3C4cae32d99d4c60f48") throw new Error("Unexpected contract in version endpoint");
-if (!version.commit || version.commit === "unknown") throw new Error("Commit metadata missing from version endpoint");
+if (version.contract !== "0xff15343aCcc4B77479EBE3C4cae32d99d4c60f48") {
+  throw new Error("Unexpected contract in version endpoint");
+}
+if (!version.commit || version.commit === "unknown") {
+  throw new Error("Commit metadata missing from version endpoint");
+}
+
+const statusResponse = await fetch(new URL("/api/status", url));
+if (!statusResponse.ok) throw new Error(`/api/status returned ${statusResponse.status}`);
+const status = await statusResponse.json();
+for (const metric of [
+  "submitted",
+  "underReview",
+  "accepted",
+  "approvalRate",
+  "uniqueBuilders",
+  "distinctProjects",
+]) {
+  if (typeof status?.metrics?.[metric] !== "number") {
+    throw new Error(`Missing numeric status metric: ${metric}`);
+  }
+}
+if (!Array.isArray(status?.builders)) throw new Error("Invalid builders payload");
 
 console.log(`Canonical smoke OK: ${url} @ ${version.commit}`);
