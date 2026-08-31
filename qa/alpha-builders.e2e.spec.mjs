@@ -100,5 +100,5 @@ test("submission rejects evidence outside github.com", async ({ page }) => {
   await page.locator(".consent-row input").check();
   await page.getByRole("button", { name: "Preparar Issue no GitHub" }).click();
 
-  await expect(page.getByRole("alert")).toContainText("github.com");
+  await expect(page.locator(".submission-form .form-error[role='alert']")).toContainText("github.com");
 });
