@@ -14,6 +14,11 @@ type NavigatorWithHints = Navigator & {
   deviceMemory?: number;
 };
 
+type IdleWindow = Window & {
+  requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number;
+  cancelIdleCallback?: (handle: number) => void;
+};
+
 function supportsWebGL() {
   try {
     const canvas = document.createElement("canvas");
@@ -30,25 +35,26 @@ export default function PerformanceAwareAlpha() {
   useEffect(() => {
     const nav = navigator as NavigatorWithHints;
     const constrained =
-      reducedMotion ||
       nav.connection?.saveData === true ||
       (typeof nav.deviceMemory === "number" && nav.deviceMemory <= 4) ||
       window.matchMedia("(max-width: 720px)").matches ||
       !supportsWebGL();
 
-    if (constrained) {
-      setAllow3d(false);
-      return;
-    }
+    if (constrained) return;
 
-    const idle = window.requestIdleCallback?.(() => setAllow3d(true), { timeout: 1600 });
+    const idleWindow = window as IdleWindow;
+    const idle = idleWindow.requestIdleCallback?.(() => setAllow3d(true), { timeout: 1600 });
     const timer = idle === undefined ? window.setTimeout(() => setAllow3d(true), 700) : undefined;
 
     return () => {
-      if (idle !== undefined) window.cancelIdleCallback?.(idle);
+      if (idle !== undefined) idleWindow.cancelIdleCallback?.(idle);
       if (timer !== undefined) window.clearTimeout(timer);
     };
-  }, [reducedMotion]);
+  }, []);
+
+  if (reducedMotion) {
+    return <div className="alpha-orb-fallback" aria-hidden="true" />;
+  }
 
   return allow3d ? <FloatingAlpha /> : <div className="alpha-orb-fallback" aria-hidden="true" />;
 }
