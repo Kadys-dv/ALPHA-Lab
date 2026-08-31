@@ -2,9 +2,6 @@ name: Frontend Smoke
 
 on:
   pull_request:
-    paths:
-      - 'web/**'
-      - '.github/workflows/frontend-smoke.yml'
   push:
     branches: [main]
     paths:
