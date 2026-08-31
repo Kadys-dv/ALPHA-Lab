@@ -1,0 +1,50 @@
+name: Cloudflare Production Smoke
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/cloudflare-production-smoke.yml'
+  workflow_dispatch:
+  schedule:
+    - cron: '17 9 * * *'
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    env:
+      PRODUCTION_URL: https://alpha-builders-web.cskadys.workers.dev
+    steps:
+      - name: Verify production site and APIs
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$(curl --fail --silent --show-error --retry 8 --retry-delay 2 --retry-all-errors "$PRODUCTION_URL/")"
+          printf '%s' "$root" | grep -Fq 'ALPHA'
+          printf '%s' "$root" | grep -Fq 'Base Sepolia'
+          ! printf '%s' "$root" | grep -Fq 'Base Mainnet'
+          ! printf '%s' "$root" | grep -Fq 'Comprar ALPHA'
+          ! printf '%s' "$root" | grep -Fq 'Swap ALPHA'
+          ! printf '%s' "$root" | grep -Fq 'Stake ALPHA'
+
+          curl --fail --silent --show-error --retry 8 --retry-delay 2 --retry-all-errors "$PRODUCTION_URL/api/version" > /tmp/version.json
+          curl --fail --silent --show-error --retry 8 --retry-delay 2 --retry-all-errors "$PRODUCTION_URL/api/status" > /tmp/status.json
+
+          node <<'NODE'
+          const fs = require('fs');
+          const version = JSON.parse(fs.readFileSync('/tmp/version.json', 'utf8'));
+          const status = JSON.parse(fs.readFileSync('/tmp/status.json', 'utf8'));
+          const expectedContract = '0xff15343accc4b77479ebe3c4cae32d99d4c60f48';
+          if (Number(version.chainId) !== 84532) throw new Error(`Unexpected chainId: ${version.chainId}`);
+          if (String(version.contract || '').toLowerCase() !== expectedContract) throw new Error(`Unexpected contract: ${version.contract}`);
+          if (!version.commit || version.commit === 'unknown') throw new Error('Missing deploy commit metadata');
+          if (!status || typeof status !== 'object') throw new Error('Invalid /api/status payload');
+          if (!status.metrics || typeof status.metrics !== 'object') throw new Error('Missing status.metrics');
+          console.log(`Production URL: ${process.env.PRODUCTION_URL}`);
+          console.log(`Deployment commit: ${version.commit}`);
+          console.log(`Chain ID: ${version.chainId}`);
+          console.log(`Contract: ${version.contract}`);
+          NODE
