@@ -1,65 +1,68 @@
 # ALPHA Lab
 
-Laboratório público para desenvolver e validar o token utilitário ERC-20 **Alpha (ALPHA)** com Hardhat 3, Solidity e Base Sepolia.
+Projeto de segurança e experimentação em blockchain para desenvolver e validar um token utilitário ERC-20 em uma experiência de produto real.
 
-O contrato já está publicado e validado em testnet. ALPHA não está à venda, não promete rendimento e não deve ser tratada como investimento. O objetivo atual é provar utilidade real antes de considerar qualquer operação comercial.
+O projeto entrega um token **ALPHA** de supply fixo, publicado na Base Sepolia, com foco em testar uma hipótese: usar recompensas e benefícios para ajudar desenvolvedores iniciantes a concluir e apresentar projetos de portfólio. A implementação prioriza invariantes verificáveis, limites explícitos e ausência de privilégios administrativos. A etapa atual é de descoberta e validação, não de venda ou investimento.
 
-## Estado atual
+## Em 30 segundos
 
-| Item | Estado |
+- **Entrega:** contrato ERC-20, testes, guardas de segurança, deploy local e deploy público em testnet.
+- **Especialidade demonstrada:** modelagem de risco, segurança por restrição e experimentação de produto em blockchain.
+- **Demo on-chain:** [ver contrato na BaseScan](https://sepolia.basescan.org/address/0xff15343aCcc4B77479EBE3C4cae32d99d4c60f48).
+- **Rede:** Base Sepolia, Chain ID `84532`.
+- **Stack:** Solidity `0.8.34`, Hardhat 3, OpenZeppelin Contracts, Hardhat Ignition e npm.
+- **Status:** infraestrutura validada; utilidade do produto ainda em descoberta.
+
+## O que foi entregue
+
+| Resultado | Evidência |
 |---|---|
-| Contrato ERC-20 | Concluído |
-| Testes Solidity | 7 aprovados |
-| Invariantes de segurança/configuração | 18 aprovadas |
-| Deploy local | Validado |
-| Deploy Base Sepolia | Validado |
-| Utilidade do produto | Em definição |
-| Venda, liquidez e mainnet | Bloqueadas |
+| Token ERC-20 com supply fixo | `100.000.000 ALPHA`, mint único no construtor |
+| Contrato público | [endereço verificado na Base Sepolia](https://sepolia.basescan.org/address/0xff15343aCcc4B77479EBE3C4cae32d99d4c60f48) |
+| Validação de configuração | 18 invariantes de código/configuração aprovadas |
+| Cobertura do contrato | 7 testes Solidity documentados |
+| Reprodutibilidade | `npm ci`, build e deploy local via Hardhat |
+| Limites de segurança | sem owner/admin, mint posterior, taxa, pause, proxy ou upgrade |
 
-## Deploy público
+## Como funciona
 
-- Rede: **Base Sepolia**
-- Chain ID: `84532`
-- Contrato: [`0xff15343aCcc4B77479EBE3C4cae32d99d4c60f48`](https://sepolia.basescan.org/address/0xff15343aCcc4B77479EBE3C4cae32d99d4c60f48)
-- Deployer: [`0xdb854d4D76a213740621e0dFa48de9BF7836c273`](https://sepolia.basescan.org/address/0xdb854d4D76a213740621e0dFa48de9BF7836c273)
-- Data da validação: `2026-08-31`
+```mermaid
+flowchart LR
+    A[Projeto do participante] --> B[Entrega verificável]
+    B --> C[Revisão ou aprovação]
+    C --> D[Recompensa ALPHA de testnet]
+    D --> E[Benefício experimental]
+    E --> F[Medição de uso e resultado]
+```
 
-Verificações on-chain concluídas:
+O contrato registra a camada de token. A utilidade, a revisão de projetos e a medição do piloto ficam fora do contrato principal para manter o experimento simples e seguro.
 
-- bytecode publicado;
-- `name = Alpha`;
-- `symbol = ALPHA`;
-- `decimals = 18`;
-- supply fixo de **100.000.000 ALPHA**;
-- 100% do supply inicial entregue ao deployer.
+## O que foi validado
 
-## Propriedades do contrato
+- O bytecode foi publicado na Base Sepolia.
+- `name = Alpha`, `symbol = ALPHA` e `decimals = 18` foram conferidos on-chain.
+- O supply inicial foi confirmado no endereço do deployer.
+- O código não possui mecanismos de emissão posterior, administração privilegiada ou upgrade.
+- O guard de fonte cobre 18 invariantes e passa localmente.
 
-- implementação ERC-20 do OpenZeppelin Contracts;
-- supply fixo e mint único no construtor;
-- sem mint posterior;
-- sem owner/admin;
-- sem taxa de transferência;
-- sem blacklist ou pause;
-- sem proxy ou upgrade;
-- sem função de venda, staking ou rendimento.
+## O que ainda falta
 
-## Desenvolvimento local
+- Entrevistar 20 usuários potenciais.
+- Publicar a landing page e a lista de espera.
+- Construir a primeira utilidade fora do contrato.
+- Executar o piloto com usuários ativos e medir ativação, retenção e custo.
+- Validar receita independente da especulação do token.
 
-Requisitos:
+Mainnet, venda pública, liquidez, staking e promessa de rendimento permanecem fora do escopo até que produto, segurança, conformidade e operação sejam comprovados.
 
-- Node.js `22.13.0` ou superior;
-- npm;
-- Git.
+## Executar localmente
 
-Instale e valide:
+Requisitos: Node.js `22.13.0` ou superior, npm e Git.
 
 ```bash
 npm ci
 npm run validate
 ```
-
-O comando `validate` executa guardas do código-fonte, compilação, testes Solidity e deploy local efêmero.
 
 Comandos individuais:
 
@@ -70,46 +73,15 @@ npm test
 npm run deploy:local
 ```
 
-## Base Sepolia
-
-O fluxo de testnet usa RPC público, Hardhat Keystore e ETH de teste sem valor real:
-
-```bash
-npm run preflight:base-sepolia -- 0xSEU_ENDERECO
-npx hardhat keystore set BASE_SEPOLIA_PRIVATE_KEY
-npm run deploy:base-sepolia
-npm run verify:base-sepolia -- 0xCONTRATO 0xDEPLOYER
-```
-
-Nunca envie seed phrase ou chave privada pelo chat, por issue, commit, `.env` versionado ou GitHub Actions.
-
-## Estratégia de produto
-
-ALPHA deverá funcionar como acesso, recompensa ou desconto dentro de um produto digital. A receita inicial deverá vir de utilidades reais, como serviços, assinaturas, parcerias ou licenciamento, e não da expectativa de valorização do token.
-
-Operação gratuita é uma meta apenas para o laboratório e a validação inicial. Uma futura operação com usuários poderá exigir gastos com segurança, infraestrutura, contabilidade, suporte e revisão jurídica.
-
 ## Documentação
 
 - [Desenho do token](docs/DESIGN.md)
 - [Deploy e evidências da Base Sepolia](docs/BASE-SEPOLIA.md)
-- [Estratégia de monetização](docs/MONETIZATION.md)
 - [Hipótese de produto ALPHA Builders](docs/PRODUCT.md)
 - [Roteiro de descoberta](docs/DISCOVERY.md)
-- [Roadmap](docs/ROADMAP.md)
+- [Roadmap de validação](docs/ROADMAP.md)
 - [Política de segurança](docs/SECURITY.md)
 
-## Escopo bloqueado
+## Nota de responsabilidade
 
-Enquanto os gates de produto, segurança e conformidade não forem cumpridos, permanecem fora do escopo:
-
-- Base Mainnet;
-- venda pública de ALPHA;
-- pool de liquidez;
-- promessa de preço, lucro ou valorização;
-- staking ou rendimento;
-- custódia de ativos de terceiros.
-
-## Licença e responsabilidade
-
-Este repositório é um laboratório técnico e não constitui oferta, recomendação de investimento, consultoria jurídica ou garantia de retorno.
+Este repositório é um laboratório técnico. ALPHA não está à venda e não constitui oferta, recomendação de investimento, consultoria jurídica ou garantia de retorno.
