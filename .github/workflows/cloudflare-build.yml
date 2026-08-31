@@ -2,9 +2,6 @@ name: Cloudflare Build
 
 on:
   pull_request:
-    paths:
-      - 'web/**'
-      - '.github/workflows/cloudflare-build.yml'
   push:
     branches: [main]
     paths:
