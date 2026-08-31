@@ -121,7 +121,7 @@ export default function AlphaBuildersApp() {
       </div>
 
       <section className="hero-latest">
-        <motion.div className="hero-copy" {...motionProps}>
+        <div className="hero-copy">
           <div className="pilot-badge"><Sparkles size={15} /> Programa piloto · Base Sepolia</div>
           <h1>Aprenda construindo. <span>Prove contribuindo.</span></h1>
           <p className="hero-lead">
@@ -139,9 +139,9 @@ export default function AlphaBuildersApp() {
             <ShieldCheck size={18} />
             Ambiente experimental de testnet. Nenhuma compra, transferência, assinatura ou taxa é solicitada.
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div className="hero-visual" {...motionProps}>
+        <div className="hero-visual">
           <div className="visual-frame">
             <span className="corner-label top-left">ALPHA CORE / TESTNET</span>
             <span className="corner-label bottom-right">84532</span>
@@ -149,7 +149,7 @@ export default function AlphaBuildersApp() {
             <div className="visual-card visual-card-a"><Network size={17} /> Base Sepolia</div>
             <div className="visual-card visual-card-b"><Code2 size={17} /> Open source</div>
           </div>
-        </motion.div>
+        </div>
       </section>
 
       <section className="purpose-panel" aria-labelledby="purpose-title">
