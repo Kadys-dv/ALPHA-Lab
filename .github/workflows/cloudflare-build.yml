@@ -21,6 +21,7 @@ concurrency:
 
 jobs:
   validate-workers-build:
+    name: Cloudflare Build
     runs-on: ubuntu-latest
     timeout-minutes: 15
     defaults:
