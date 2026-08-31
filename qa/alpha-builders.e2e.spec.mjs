@@ -71,7 +71,11 @@ test("home keeps critical content keyboard and WCAG accessible", async ({ page }
     });
     return result.violations
       .filter((violation) => violation.impact === "critical" || violation.impact === "serious")
-      .map((violation) => ({ id: violation.id, impact: violation.impact, nodes: violation.nodes.length }));
+      .map((violation) => ({
+        id: violation.id,
+        impact: violation.impact,
+        nodes: violation.nodes.map((node) => ({ target: node.target, html: node.html })),
+      }));
   });
 
   expect(seriousViolations).toEqual([]);
