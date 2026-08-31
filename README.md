@@ -2,7 +2,7 @@
 
 Laboratório público para desenvolver e validar o token utilitário ERC-20 **Alpha (ALPHA)** com Hardhat 3, Solidity e Base Sepolia.
 
-O contrato já está publicado e validado em testnet. ALPHA não está à venda, não promete rendimento e não deve ser tratada como investimento. O objetivo atual é provar utilidade real antes de considerar qualquer operação comercial.
+O contrato já está publicado e validado em testnet. ALPHA não está à venda, não promete rendimento e não deve ser tratada como investimento. O objetivo atual é validar utilidade real por meio do **ALPHA Builders**, experiência pública voltada à revisão e apresentação de projetos de desenvolvedores.
 
 ## Estado atual
 
@@ -13,8 +13,23 @@ O contrato já está publicado e validado em testnet. ALPHA não está à venda,
 | Invariantes de segurança/configuração | 18 aprovadas |
 | Deploy local | Validado |
 | Deploy Base Sepolia | Validado |
-| Utilidade do produto | Em definição |
+| ALPHA Builders | Publicado |
+| Utilidade inicial | Revisão estruturada de README |
+| Submissão de contribuições | GitHub Issue real |
 | Venda, liquidez e mainnet | Bloqueadas |
+| Código-fonte do frontend neste repositório | Importação pendente |
+
+## ALPHA Builders
+
+A experiência pública está disponível em:
+
+https://alpha-builders.kadys-v2.chatgpt.site
+
+O frontend publicado foi reconstruído com foco em acessibilidade, responsividade, narrativa visual e integração segura com Base Sepolia. O fluxo atual inclui conexão de carteira EVM, inclusão/troca para Base Sepolia, leitura de métricas públicas do contrato, desafio de revisão de README e submissão por GitHub Issue.
+
+O fluxo de carteira permanece deliberadamente somente leitura/interação de rede: não há compra, transferência, `approve`, swap, staking, assinatura financeira ou integração com Base Mainnet.
+
+> Observação de versionamento: o código-fonte do frontend publicado ainda não está presente nesta branch/repositório. Enquanto essa importação não ocorrer, o GitHub não é a fonte completa de verdade do ALPHA Builders. Consulte `docs/FRONTEND.md`.
 
 ## Deploy público
 
@@ -44,7 +59,7 @@ Verificações on-chain concluídas:
 - sem proxy ou upgrade;
 - sem função de venda, staking ou rendimento.
 
-## Desenvolvimento local
+## Desenvolvimento local do contrato
 
 Requisitos:
 
@@ -85,9 +100,9 @@ Nunca envie seed phrase ou chave privada pelo chat, por issue, commit, `.env` ve
 
 ## Estratégia de produto
 
-ALPHA deverá funcionar como acesso, recompensa ou desconto dentro de um produto digital. A receita inicial deverá vir de utilidades reais, como serviços, assinaturas, parcerias ou licenciamento, e não da expectativa de valorização do token.
+O ALPHA Builders testa utilidade sem depender de venda ou valorização do token. A primeira utilidade escolhida é a revisão estruturada de README, com evidências públicas e submissões rastreáveis por GitHub.
 
-Operação gratuita é uma meta apenas para o laboratório e a validação inicial. Uma futura operação com usuários poderá exigir gastos com segurança, infraestrutura, contabilidade, suporte e revisão jurídica.
+Qualquer futura operação comercial deverá continuar separando receita real, cobrada em moeda fiduciária por serviços, de recompensas experimentais em testnet.
 
 ## Documentação
 
@@ -95,6 +110,7 @@ Operação gratuita é uma meta apenas para o laboratório e a validação inici
 - [Deploy e evidências da Base Sepolia](docs/BASE-SEPOLIA.md)
 - [Estratégia de monetização](docs/MONETIZATION.md)
 - [Hipótese de produto ALPHA Builders](docs/PRODUCT.md)
+- [Estado e versionamento do frontend](docs/FRONTEND.md)
 - [Roteiro de descoberta](docs/DISCOVERY.md)
 - [Roadmap](docs/ROADMAP.md)
 - [Política de segurança](docs/SECURITY.md)
