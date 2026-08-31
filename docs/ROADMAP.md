@@ -11,7 +11,7 @@
 
 ## Fase 2 — execução local: concluída
 
-- [x] instalação reproduzível com `npm ci`
+- [x] instalação reproduzível do contrato com `npm ci`
 - [x] compilação Solidity 0.8.34
 - [x] 18 invariantes de código/configuração
 - [x] 7 testes Solidity
@@ -21,10 +21,9 @@
 
 - [x] carteira exclusiva de testes
 - [x] ETH gratuito de testnet
-- [x] chave armazenada no Hardhat Keystore
 - [x] deploy público
 - [x] bytecode e metadados validados on-chain
-- [x] supply inicial confirmado no deployer
+- [x] supply inicial confirmado
 - [x] endereço registrado na documentação
 
 Contrato validado: `0xff15343aCcc4B77479EBE3C4cae32d99d4c60f48`.
@@ -38,40 +37,52 @@ Contrato validado: `0xff15343aCcc4B77479EBE3C4cae32d99d4c60f48`.
 - [x] documentar hipótese inicial de distribuição e antiabuso
 - [x] manter o contrato principal inalterado durante a descoberta
 
-## Fase 5 — piloto gratuito: implementação inicial publicada
+## Fase 5 — MVP do ALPHA Builders: concluída
 
-- [x] publicar landing page ALPHA Builders
-- [x] construir a primeira utilidade fora do contrato principal: desafio de revisão estruturada de README
-- [x] permitir submissão real por GitHub Issue
-- [x] integrar carteira EVM com Base Sepolia sem transações financeiras
-- [x] exibir métricas públicas do contrato
-- [x] tratar ausência de carteira, rede incorreta e conexão cancelada
-- [x] incluir avisos claros de testnet e ausência de valor financeiro
-- [ ] importar o código-fonte atual do frontend para este repositório ou para um repositório oficial vinculado
-- [ ] adicionar CI reproduzível do frontend no repositório que receber o código-fonte
+- [x] publicar landing page
+- [x] desafio de revisão estruturada de README
+- [x] submissão real por GitHub Issue
+- [x] carteira EVM com Base Sepolia sem transações financeiras
+- [x] tratamento de carteira ausente, rede incorreta e cancelamento
+- [x] avisos de testnet e ausência de valor financeiro
+
+Site atual: https://alpha-builders.kadys-v2.chatgpt.site
+
+## Fase 5.1 — fonte de verdade e qualidade: implementada
+
+- [x] versionar fonte canônica do frontend em `web/`
+- [x] manter Next.js/React/TypeScript/Framer Motion/R3F no repositório
+- [x] adicionar CI de lint, TypeScript, testes, build e audit
+- [x] adicionar smoke test do deploy público
+- [x] adicionar endpoint `/api/version` para SHA de deploy
+- [x] documentar limitação de rastreabilidade do host atual
+- [ ] versionar `web/package-lock.json` gerado e validado pelo CI
+- [ ] migrar o deploy futuro para uma hospedagem diretamente ligada ao repositório/commit
+
+## Fase 6 — pipeline de contribuições: implementada tecnicamente
+
+- [x] Issue Form de submissão
+- [x] suporte ao formulário prefilled usado pelo site
+- [x] validação automática de URL GitHub
+- [x] confirmação de repositório público
+- [x] verificação de README
+- [x] validação de endereço EVM
+- [x] labels `submission`, `valid`, `invalid`, `needs-review`, `under-review`, `accepted`
+- [x] impedir aceite automático
+- [x] seção pública de Builders aceitos
+- [x] sanitizar os campos publicados
+- [x] métricas públicas de submissões, revisão e aceite
+- [ ] validar o workflow com submissões reais após merge na `main`
+
+## Fase 6.1 — piloto com usuários
+
 - [ ] obter 10 usuários ativos
-- [ ] validar uso repetido por pelo menos 5 usuários
-- [ ] medir ativação, retenção e custo operacional
-
-Site publicado: https://alpha-builders.kadys-v2.chatgpt.site
-
-## Fase 5.1 — consolidação da fonte de verdade
-
-- [x] atualizar README e roadmap para refletir o produto já publicado
-- [x] documentar a arquitetura e as limitações atuais do frontend
-- [ ] versionar o código-fonte exato do frontend publicado
-- [ ] vincular cada deploy do frontend a um commit/tag identificável
-- [ ] executar lint, TypeScript, testes, build e auditoria em CI
-- [ ] adicionar smoke test do deploy público
-
-## Fase 6 — validação operacional
-
-- [ ] validar submissões reais de usuários sem depender de armazenamento fictício
-- [ ] definir processo humano de revisão e status das contribuições
-- [ ] reduzir spam/abuso nas Issues sem coletar dados privados desnecessários
-- [ ] medir taxa de conclusão do desafio
+- [ ] obter pelo menos 7 submissões concluídas
+- [ ] medir taxa de conclusão
+- [ ] medir tempo até revisão
 - [ ] medir qualidade percebida da revisão de README
-- [ ] decidir, com dados, se a experiência precisa de backend próprio
+- [ ] validar repetição de uso por pelo menos 5 usuários
+- [ ] decidir, com dados, se é necessário backend próprio
 
 ## Fase 7 — primeira receita
 
