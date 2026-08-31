@@ -11,27 +11,60 @@ O contrato já está publicado e validado em testnet. ALPHA não está à venda,
 | Contrato ERC-20 | Concluído |
 | Testes Solidity | 7 aprovados |
 | Invariantes de segurança/configuração | 18 aprovadas |
-| Deploy local | Validado |
 | Deploy Base Sepolia | Validado |
 | ALPHA Builders | Publicado |
+| Fonte canônica do frontend | Versionada em `web/` |
 | Utilidade inicial | Revisão estruturada de README |
 | Submissão de contribuições | GitHub Issue real |
+| Validação técnica de submissões | GitHub Actions |
+| Aprovação final | Revisão humana |
 | Venda, liquidez e mainnet | Bloqueadas |
-| Código-fonte do frontend neste repositório | Importação pendente |
 
 ## ALPHA Builders
 
-A experiência pública está disponível em:
+Experiência pública atual: https://alpha-builders.kadys-v2.chatgpt.site
 
-https://alpha-builders.kadys-v2.chatgpt.site
+A pasta `web/` agora contém uma fonte canônica e reproduzível do ALPHA Builders, construída a partir do comportamento validado da versão publicada. Ela preserva a identidade neo-brutalista, animações com Framer Motion, elemento 3D com React Three Fiber/Drei, carteira EVM, Base Sepolia, desafio de README, métricas públicas de produto e histórico de Builders aceitos.
 
-O frontend publicado foi reconstruído com foco em acessibilidade, responsividade, narrativa visual e integração segura com Base Sepolia. O fluxo atual inclui conexão de carteira EVM, inclusão/troca para Base Sepolia, leitura de métricas públicas do contrato, desafio de revisão de README e submissão por GitHub Issue.
+A fonte em `web/` não é apresentada como recuperação byte-a-byte dos arquivos originais do host anterior; ela é a implementação versionada que passa a servir como referência de desenvolvimento daqui em diante.
 
-O fluxo de carteira permanece deliberadamente somente leitura/interação de rede: não há compra, transferência, `approve`, swap, staking, assinatura financeira ou integração com Base Mainnet.
+O fluxo de carteira permanece deliberadamente sem operações financeiras: não há compra, transferência, `approve`, `permit`, swap, bridge, staking, assinatura de transação financeira ou integração com Base Mainnet.
 
-> Observação de versionamento: o código-fonte do frontend publicado ainda não está presente nesta branch/repositório. Enquanto essa importação não ocorrer, o GitHub não é a fonte completa de verdade do ALPHA Builders. Consulte `docs/FRONTEND.md`.
+## Frontend local
 
-## Deploy público
+```bash
+cd web
+npm install
+npm run lint
+npm run typecheck
+npm test
+npm run build
+npm run dev
+```
+
+O CI gera um lockfile quando ele ainda não estiver presente e usa `npm ci` na própria execução. O próximo merge que estabilizar as dependências deverá manter `web/package-lock.json` versionado para eliminar esse bootstrap temporário.
+
+## Pipeline de contribuições
+
+Submissões do ALPHA Builders são Issues públicas. A automação:
+
+1. reconhece Issues com título `[ALPHA Builders]`;
+2. valida URL de repositório GitHub;
+3. confirma que o repositório existe e é público;
+4. verifica se há README;
+5. valida o formato do endereço EVM público;
+6. aplica estados técnicos como `valid`, `invalid`, `needs-review` e `under-review`;
+7. nunca aplica `accepted` automaticamente.
+
+A aprovação `accepted` permanece uma decisão humana. A seção pública de Builders consome apenas dados públicos sanitizados de Issues aceitas.
+
+## Rastreabilidade de deploy
+
+O frontend expõe `/api/version`, com versão, Chain ID, contrato e SHA de commit quando o ambiente de hospedagem fornece `VERCEL_GIT_COMMIT_SHA`, `GITHUB_SHA` ou `NEXT_PUBLIC_GIT_SHA`. O CI injeta `NEXT_PUBLIC_GIT_SHA` durante o build.
+
+A URL atual em `chatgpt.site` ainda não é controlada por este repositório, então ela não pode ser retroativamente vinculada a um commit. Novos deploys reproduzíveis devem partir da fonte `web/` e publicar o SHA pelo endpoint de versão.
+
+## Deploy público do contrato
 
 - Rede: **Base Sepolia**
 - Chain ID: `84532`
@@ -61,20 +94,10 @@ Verificações on-chain concluídas:
 
 ## Desenvolvimento local do contrato
 
-Requisitos:
-
-- Node.js `22.13.0` ou superior;
-- npm;
-- Git.
-
-Instale e valide:
-
 ```bash
 npm ci
 npm run validate
 ```
-
-O comando `validate` executa guardas do código-fonte, compilação, testes Solidity e deploy local efêmero.
 
 Comandos individuais:
 
@@ -86,8 +109,6 @@ npm run deploy:local
 ```
 
 ## Base Sepolia
-
-O fluxo de testnet usa RPC público, Hardhat Keystore e ETH de teste sem valor real:
 
 ```bash
 npm run preflight:base-sepolia -- 0xSEU_ENDERECO
@@ -102,7 +123,7 @@ Nunca envie seed phrase ou chave privada pelo chat, por issue, commit, `.env` ve
 
 O ALPHA Builders testa utilidade sem depender de venda ou valorização do token. A primeira utilidade escolhida é a revisão estruturada de README, com evidências públicas e submissões rastreáveis por GitHub.
 
-Qualquer futura operação comercial deverá continuar separando receita real, cobrada em moeda fiduciária por serviços, de recompensas experimentais em testnet.
+As métricas prioritárias são de produto: submissões, itens em revisão, contribuições aceitas, conclusão e uso repetido. Métricas do token não substituem validação de utilidade.
 
 ## Documentação
 
@@ -110,14 +131,12 @@ Qualquer futura operação comercial deverá continuar separando receita real, c
 - [Deploy e evidências da Base Sepolia](docs/BASE-SEPOLIA.md)
 - [Estratégia de monetização](docs/MONETIZATION.md)
 - [Hipótese de produto ALPHA Builders](docs/PRODUCT.md)
-- [Estado e versionamento do frontend](docs/FRONTEND.md)
+- [Frontend e pipeline](docs/FRONTEND.md)
 - [Roteiro de descoberta](docs/DISCOVERY.md)
 - [Roadmap](docs/ROADMAP.md)
 - [Política de segurança](docs/SECURITY.md)
 
 ## Escopo bloqueado
-
-Enquanto os gates de produto, segurança e conformidade não forem cumpridos, permanecem fora do escopo:
 
 - Base Mainnet;
 - venda pública de ALPHA;
