@@ -44,6 +44,12 @@ if (!version.commit || version.commit === "unknown") {
 const statusResponse = await fetch(new URL("/api/status", url));
 if (!statusResponse.ok) throw new Error(`/api/status returned ${statusResponse.status}`);
 const status = await statusResponse.json();
+if (!["ok", "partial", "unavailable"].includes(status?.state)) {
+  throw new Error(`Invalid status state: ${status?.state}`);
+}
+if (!status?.checkedAt || Number.isNaN(Date.parse(status.checkedAt))) {
+  throw new Error("Missing status checkedAt timestamp");
+}
 for (const metric of [
   "submitted",
   "underReview",
@@ -51,11 +57,14 @@ for (const metric of [
   "approvalRate",
   "uniqueBuilders",
   "distinctProjects",
+  "repeatBuilders",
+  "acceptedPerBuilder",
 ]) {
-  if (typeof status?.metrics?.[metric] !== "number") {
-    throw new Error(`Missing numeric status metric: ${metric}`);
+  const value = status?.metrics?.[metric];
+  if (value !== null && typeof value !== "number") {
+    throw new Error(`Invalid status metric: ${metric}`);
   }
 }
 if (!Array.isArray(status?.builders)) throw new Error("Invalid builders payload");
 
-console.log(`Canonical smoke OK: ${url} @ ${version.commit}`);
+console.log(`Canonical smoke OK: ${url} @ ${version.commit} (${status.state})`);
