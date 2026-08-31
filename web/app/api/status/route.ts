@@ -117,7 +117,7 @@ export async function GET() {
   const successfulSources = [submitted.ok, underReview.ok, accepted.ok].filter(Boolean).length;
   const state = successfulSources === 3 ? "ok" : successfulSources === 0 ? "unavailable" : "partial";
 
-  const response = NextResponse.json(
+  return NextResponse.json(
     {
       state,
       checkedAt,
@@ -134,13 +134,10 @@ export async function GET() {
       builders,
     },
     {
-      status: state === "unavailable" ? 503 : 200,
       headers: {
         "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
         "X-ALPHA-Status": state,
       },
     },
   );
-
-  return response;
 }
