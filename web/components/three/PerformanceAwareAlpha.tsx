@@ -2,7 +2,6 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import { useReducedMotion } from "framer-motion";
 
 const FloatingAlpha = dynamic(() => import("./FloatingAlpha"), {
   ssr: false,
@@ -24,14 +23,12 @@ function supportsWebGL() {
 }
 
 export default function PerformanceAwareAlpha() {
-  const reducedMotion = useReducedMotion();
   const [allow3d, setAllow3d] = useState(false);
 
   useEffect(() => {
-    if (reducedMotion) return;
-
     const nav = navigator as NavigatorWithHints;
     const constrained =
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
       nav.connection?.saveData === true ||
       (typeof nav.deviceMemory === "number" && nav.deviceMemory <= 4) ||
       window.matchMedia("(max-width: 720px)").matches ||
@@ -61,11 +58,7 @@ export default function PerformanceAwareAlpha() {
       window.removeEventListener("keydown", activate);
       window.removeEventListener("scroll", activate);
     };
-  }, [reducedMotion]);
-
-  if (reducedMotion) {
-    return <div className="alpha-orb-fallback" aria-hidden="true" />;
-  }
+  }, []);
 
   return allow3d ? <FloatingAlpha /> : <div className="alpha-orb-fallback" aria-hidden="true" />;
 }
