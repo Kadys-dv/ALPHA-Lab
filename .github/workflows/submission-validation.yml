@@ -33,28 +33,31 @@ jobs:
               }
             };
 
-            const labelDefs = [
+            for (const [name,color,description] of [
               ['submission','1d76db','ALPHA Builders public submission'],
               ['under-review','fbca04','Waiting for human review'],
               ['valid','0e8a16','Technical checks passed'],
               ['invalid','d73a4a','Technical checks failed'],
               ['needs-review','5319e7','Requires manual inspection'],
               ['accepted','2ea44f','Accepted after human review']
-            ];
-            for (const [name,color,description] of labelDefs) await ensureLabel(name,color,description);
+            ]) await ensureLabel(name,color,description);
 
             const body = issue.body || '';
-            const repoMatch = body.match(/^Repository:\s*(https:\/\/github\.com\/[^\s/]+\/[^\s/]+)\s*$/im);
-            const walletMatch = body.match(/^Wallet:\s*(0x[a-fA-F0-9]{40})\s*$/im);
+            const inlineRepo = body.match(/^Repository:\s*(https:\/\/github\.com\/[^\s/]+\/[^\s/]+)\s*$/im)?.[1];
+            const formRepo = body.match(/### Repository\s+\n\s*(https:\/\/github\.com\/[^\s/]+\/[^\s/]+)/im)?.[1];
+            const inlineWallet = body.match(/^Wallet:\s*(0x[a-fA-F0-9]{40})\s*$/im)?.[1];
+            const formWallet = body.match(/### Wallet\s+\n\s*(0x[a-fA-F0-9]{40})/im)?.[1];
+            const repoUrl = inlineRepo || formRepo;
+            const wallet = inlineWallet || formWallet;
             const base = ['submission'];
 
-            if (!repoMatch || !walletMatch) {
+            if (!repoUrl || !wallet) {
               await github.rest.issues.setLabels({ ...context.repo, issue_number: issue.number, labels: [...base, 'invalid'] });
               await github.rest.issues.createComment({ ...context.repo, issue_number: issue.number, body: 'Validação automática: faltou uma URL pública de repositório GitHub ou um endereço EVM público válido. Nenhuma aprovação foi realizada.' });
               return;
             }
 
-            const parsed = new URL(repoMatch[1]);
+            const parsed = new URL(repoUrl);
             const parts = parsed.pathname.split('/').filter(Boolean);
             if (parsed.protocol !== 'https:' || parsed.hostname !== 'github.com' || parts.length !== 2) {
               await github.rest.issues.setLabels({ ...context.repo, issue_number: issue.number, labels: [...base, 'invalid'] });
