@@ -22,6 +22,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          # Validate the live Worker rather than only the repository build.
           root="$(curl --fail --silent --show-error --retry 8 --retry-delay 2 --retry-all-errors "$PRODUCTION_URL/")"
           printf '%s' "$root" | grep -Fq 'ALPHA'
           printf '%s' "$root" | grep -Fq 'Base Sepolia'
