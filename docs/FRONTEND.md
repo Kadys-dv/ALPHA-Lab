@@ -1,53 +1,47 @@
-# ALPHA Builders — frontend publicado
+# ALPHA Builders — frontend e pipeline
 
-## URL pública
+## URL pública atual
 
 https://alpha-builders.kadys-v2.chatgpt.site
 
-## Estado conhecido
+## Fonte canônica
 
-O ALPHA Builders publicado representa a primeira implementação funcional da hipótese de produto descrita em `docs/PRODUCT.md`.
+A implementação versionada do frontend está em `web/`.
 
-Características já implementadas e validadas no ambiente publicado:
+Ela foi construída a partir do comportamento já validado da experiência publicada e passa a ser a referência de desenvolvimento do ALPHA Builders. Não é apresentada como recuperação byte-a-byte dos arquivos originais do host anterior.
 
-- identidade visual neo-brutalista com Aurora Bloom;
-- elemento 3D interativo com Three.js / React Three Fiber;
-- animações de rolagem com Framer Motion;
-- layout responsivo para celular, tablet e desktop;
-- conexão com carteiras EVM;
-- inclusão e troca para Base Sepolia;
-- tratamento de carteira ausente, rede errada e conexão cancelada;
-- métricas públicas do contrato;
-- cópia do endereço do contrato;
+Principais capacidades versionadas:
+
+- Next.js App Router, React 19 e TypeScript strict;
+- estética neo-brutalista com Aurora Bloom;
+- React Three Fiber/Drei e Three.js;
+- Framer Motion;
+- layout responsivo;
+- conexão EVM;
+- troca/adição de Base Sepolia;
+- listeners `accountsChanged`, `chainChanged` e `disconnect` com cleanup;
+- tratamento de carteira ausente, rede incorreta e cancelamento;
 - desafio de revisão estruturada de README;
-- validação de URLs do GitHub;
-- submissão por abertura real de GitHub Issue;
-- redução de animações/3D em dispositivos limitados;
-- avisos de testnet e ausência de valor financeiro.
+- validação de URL GitHub e endereço EVM;
+- submissão por GitHub Issue;
+- métricas públicas de produto derivadas de Issues;
+- seção pública de Builders aceitos;
+- endpoint `/api/version` para rastreabilidade de deploy;
+- fallback para `prefers-reduced-motion`.
 
-## Restrições preservadas
+## Segurança preservada
 
-O frontend não deve habilitar:
+O frontend não habilita:
 
 - Base Mainnet;
 - compra ou venda de ALPHA;
 - transferência de ativos;
 - `approve` ou `permit`;
 - swap, bridge ou staking;
-- assinatura de transações financeiras;
+- assinatura de mensagens ou transações financeiras;
 - promessa de preço, lucro, rendimento ou valorização.
 
-## Lacuna de versionamento
-
-Na data desta documentação, o código-fonte exato do frontend publicado não está armazenado neste repositório `ALPHA-Lab`.
-
-Por isso, esta documentação descreve o estado funcional conhecido, mas não substitui o código-fonte. A consolidação só estará completa quando a versão exata publicada for importada e cada deploy puder ser relacionado a um commit ou tag.
-
-Não é recomendável reconstruir o site a partir dos bundles compilados do ambiente publicado, porque isso não preservaria a fonte original, histórico de desenvolvimento, nomes de componentes, testes ou configuração de build.
-
-## Estrutura recomendada após a importação
-
-Se o frontend for mantido neste mesmo repositório, a estrutura preferida é:
+## Estrutura
 
 ```text
 ALPHA-Lab/
@@ -57,20 +51,18 @@ ALPHA-Lab/
   scripts/
   web/
     app/
+      api/status/
+      api/version/
     components/
-    hooks/
     lib/
-    public/
+    scripts/
     tests/
     package.json
-    package-lock.json
 ```
 
-A alternativa aceitável é um repositório oficial separado, desde que o README deste projeto aponte explicitamente para ele e os deploys permaneçam rastreáveis por commit.
+## CI do frontend
 
-## CI mínimo esperado para o frontend
-
-Depois da importação do código-fonte, o CI deve executar de forma reproduzível:
+`.github/workflows/frontend-ci.yml` executa:
 
 ```bash
 npm ci
@@ -78,17 +70,55 @@ npm run lint
 npm run typecheck
 npm test
 npm run build
-npm audit --omit=dev
+npm audit --omit=dev --audit-level=high
 ```
 
-Os nomes reais dos scripts devem seguir o `package.json` importado. O workflow não deve ser criado com comandos fictícios antes de o código-fonte estar disponível.
+Como o frontend foi introduzido sem um lockfile recuperável do host anterior, o workflow atual cria um `package-lock.json` temporário quando ele não existe e então executa `npm ci`. Esse bootstrap deve desaparecer assim que um `web/package-lock.json` validado for versionado.
 
-## Próximos gates
+## Smoke test
 
-1. importar a fonte exata da versão publicada;
-2. registrar o primeiro commit/tag correspondente ao deploy atual;
-3. criar CI do frontend;
-4. executar smoke test contra a URL pública;
-5. validar eventos `accountsChanged`, `chainChanged` e `disconnect`;
-6. revisar a sanitização dos dados usados para compor GitHub Issues;
-7. só então expandir o pipeline de contribuições.
+`.github/workflows/frontend-smoke.yml` verifica a URL pública e exige marcadores de ALPHA/Base Sepolia, além de rejeitar marcadores explícitos de Mainnet, compra, swap ou staking.
+
+O smoke testa a disponibilidade da implantação atual, mas não prova que `chatgpt.site` foi gerado pelo commit do repositório. Essa limitação permanece até a hospedagem passar a fazer deploy diretamente da fonte `web/`.
+
+## Contribuições
+
+`.github/workflows/submission-validation.yml` processa Issues `[ALPHA Builders]` e:
+
+- cria/garante labels operacionais;
+- aceita tanto submissão prefilled pelo site quanto Issue Form;
+- valida URL HTTPS de GitHub;
+- confirma repositório público;
+- procura README;
+- valida endereço EVM público;
+- aplica `submission`, `valid`, `invalid`, `needs-review` e `under-review`;
+- nunca aplica `accepted` automaticamente.
+
+`accepted` é reservado à revisão humana.
+
+## Histórico público
+
+`/api/status` consulta apenas Issues públicas e devolve:
+
+- total de submissões;
+- total em revisão;
+- total aceito;
+- até 12 Builders aceitos com Issue, repositório e endereço EVM abreviado.
+
+O frontend não renderiza HTML arbitrário de Issues e só publica campos extraídos por expressões restritas.
+
+## Métricas
+
+Classificação recomendada:
+
+- `ON_CHAIN`: dados verificáveis do contrato, como supply;
+- `GITHUB`: submissões, revisões e aceites;
+- `STATIC`: Chain ID e contrato configurado.
+
+A avaliação de produto deve priorizar submissão, conclusão, aceitação e repetição de uso, não quantidade de tokens.
+
+## Rastreabilidade
+
+`/api/version` retorna `version`, `chainId`, `contract` e o SHA disponível no ambiente. O build de CI injeta `NEXT_PUBLIC_GIT_SHA`.
+
+A URL atual em `chatgpt.site` não oferece, por meio deste repositório, controle de deploy ou associação retroativa a um commit. Novos deploys reproduzíveis devem ser feitos a partir de `web/`.
