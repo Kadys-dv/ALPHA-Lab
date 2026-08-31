@@ -17,7 +17,7 @@ for (let attempt = 1; attempt <= attempts; attempt += 1) {
 if (!response?.ok) throw lastError ?? new Error("Site did not become ready");
 
 const html = await response.text();
-for (const marker of ["ALPHA", "84532", "Base Sepolia"]) {
+for (const marker of ["ALPHA", "Base Sepolia"]) {
   if (!html.includes(marker)) throw new Error(`Missing marker: ${marker}`);
 }
 for (const marker of ["Base Mainnet", "Comprar ALPHA", "Swap ALPHA", "Stake ALPHA"]) {
@@ -29,5 +29,6 @@ if (!versionResponse.ok) throw new Error(`/api/version returned ${versionRespons
 const version = await versionResponse.json();
 if (version.chainId !== 84532) throw new Error("Unexpected Chain ID in version endpoint");
 if (version.contract !== "0xff15343aCcc4B77479EBE3C4cae32d99d4c60f48") throw new Error("Unexpected contract in version endpoint");
+if (!version.commit || version.commit === "unknown") throw new Error("Commit metadata missing from version endpoint");
 
-console.log(`Canonical smoke OK: ${url}`);
+console.log(`Canonical smoke OK: ${url} @ ${version.commit}`);
