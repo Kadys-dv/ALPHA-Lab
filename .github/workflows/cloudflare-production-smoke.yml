@@ -22,7 +22,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          # Validate the live Worker rather than only the repository build.
           root="$(curl --fail --silent --show-error --retry 8 --retry-delay 2 --retry-all-errors "$PRODUCTION_URL/")"
           printf '%s' "$root" | grep -Fq 'ALPHA'
           printf '%s' "$root" | grep -Fq 'Base Sepolia'
@@ -44,8 +43,11 @@ jobs:
           if (!version.commit || version.commit === 'unknown') throw new Error('Missing deploy commit metadata');
           if (!status || typeof status !== 'object') throw new Error('Invalid /api/status payload');
           if (!status.metrics || typeof status.metrics !== 'object') throw new Error('Missing status.metrics');
+          if (!['ok', 'partial', 'unavailable'].includes(status.state)) throw new Error(`Invalid status.state: ${status.state}`);
+          if (!status.checkedAt || Number.isNaN(Date.parse(status.checkedAt))) throw new Error('Missing status.checkedAt');
           console.log(`Production URL: ${process.env.PRODUCTION_URL}`);
           console.log(`Deployment commit: ${version.commit}`);
           console.log(`Chain ID: ${version.chainId}`);
           console.log(`Contract: ${version.contract}`);
+          console.log(`Public status source state: ${status.state}`);
           NODE

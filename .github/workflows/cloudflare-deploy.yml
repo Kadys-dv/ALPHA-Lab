@@ -34,10 +34,10 @@ jobs:
       PRODUCTION_URL: https://alpha-builders-web.cskadys.workers.dev
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 22.16.0
           cache: npm
@@ -94,6 +94,9 @@ jobs:
           if (version.commit !== expectedSha) throw new Error(`Deployment SHA mismatch: expected ${expectedSha}, got ${version.commit}`);
           if (!status || typeof status !== 'object') throw new Error('Invalid /api/status payload');
           if (!status.metrics || typeof status.metrics !== 'object') throw new Error('Missing status.metrics');
+          if (!['ok', 'partial', 'unavailable'].includes(status.state)) throw new Error(`Invalid status.state: ${status.state}`);
+          if (!status.checkedAt || Number.isNaN(Date.parse(status.checkedAt))) throw new Error('Missing status.checkedAt');
           console.log(`Production verified at ${process.env.PRODUCTION_URL}`);
           console.log(`Deployment commit: ${version.commit}`);
+          console.log(`Public status source state: ${status.state}`);
           NODE
