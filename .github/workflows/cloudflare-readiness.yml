@@ -1,0 +1,32 @@
+name: Cloudflare Readiness
+
+on:
+  push:
+    branches:
+      - chore/cloudflare-readiness
+    paths:
+      - '.github/workflows/cloudflare-readiness.yml'
+      - 'web/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compatibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.16.0'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install canonical frontend
+        run: npm ci --no-audit --no-fund
+      - name: Check vinext compatibility
+        run: npx --yes vinext@latest check
