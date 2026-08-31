@@ -128,15 +128,11 @@ export default function AlphaBuildersApp() {
             Um laboratório open source para transformar pequenas contribuições públicas em evidências técnicas verificáveis — sem venda de token, sem promessa financeira e sem atalhos de portfólio.
           </p>
           <div className="hero-actions">
-            <a
-              className="neo-button primary"
-              href="#challenge"
-              onClick={!account ? (event) => { event.preventDefault(); void connect(); } : undefined}
-            >
-              Entrar no piloto <ArrowRight size={18} />
+            <a className="neo-button primary" href="#challenge">
+              Ver desafios <ArrowRight size={18} />
             </a>
-            <a className="neo-button secondary" href={repositoryUrl} target="_blank" rel="noreferrer">
-              <Github size={18} /> Ver código aberto
+            <a className="neo-button secondary" href="#flow">
+              <Code2 size={18} /> Como funciona
             </a>
           </div>
           <div className="hero-footnote">
@@ -156,10 +152,20 @@ export default function AlphaBuildersApp() {
         </motion.div>
       </section>
 
-      <section className="story-band" aria-label="Princípios do piloto">
-        <div><span>01</span><strong>CONSTRUA</strong><small>uma melhoria objetiva</small></div>
-        <div><span>02</span><strong>PUBLIQUE</strong><small>a evidência no GitHub</small></div>
-        <div><span>03</span><strong>VALIDE</strong><small>com histórico rastreável</small></div>
+      <section className="purpose-panel" aria-labelledby="purpose-title">
+        <div className="purpose-heading">
+          <ShieldCheck size={28} aria-hidden="true" />
+          <div>
+            <h2 id="purpose-title">Propósito do ALPHA Builders</h2>
+            <p>Fortalecer portfólios com código aberto real, rastreável e verificável. Aqui, cada contribuição deixa um rastro técnico que fala por você.</p>
+          </div>
+        </div>
+        <div className="story-band" aria-label="Princípios do piloto">
+          <div><Github size={26} aria-hidden="true" /><strong>Aberto</strong><small>Tudo é público e auditável.</small></div>
+          <div><ShieldCheck size={26} aria-hidden="true" /><strong>Verificável</strong><small>Evidências técnicas on-chain e off-chain.</small></div>
+          <div><Code2 size={26} aria-hidden="true" /><strong>Sem token à venda</strong><small>Sem venda, sem rendimento e sem promessa financeira.</small></div>
+          <div><Network size={26} aria-hidden="true" /><strong>Para builders</strong><small>Feito para transformar contribuição em prova técnica.</small></div>
+        </div>
       </section>
 
       <motion.section className="challenge-latest section-shell" id="challenge" {...motionProps}>
