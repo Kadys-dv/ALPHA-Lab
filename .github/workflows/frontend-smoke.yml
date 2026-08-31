@@ -23,6 +23,7 @@ concurrency:
 
 jobs:
   smoke:
+    name: Frontend Smoke
     runs-on: ubuntu-latest
     timeout-minutes: 12
     defaults:

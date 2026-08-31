@@ -23,6 +23,7 @@ concurrency:
 
 jobs:
   browser-quality:
+    name: Frontend Browser Quality
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
