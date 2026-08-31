@@ -2,6 +2,15 @@
 
 Sou desenvolvedor web e mobile. Construo produtos que conectam software, segurança, produto e experimentação prática.
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Kadys-dv/ALPHA-Lab/docs/portfolio-showcase/docs/alpha-lab-banner.svg" alt="ALPHA Lab: security, blockchain and product experimentation" width="100%" />
+</p>
+
+<p align="center">
+  <a href="https://github.com/Kadys-dv/ALPHA-Lab/actions/workflows/solidity-validation.yml"><img src="https://github.com/Kadys-dv/ALPHA-Lab/actions/workflows/solidity-validation.yml/badge.svg" alt="Solidity Validation" /></a>
+  <a href="https://alpha-builders-web.cskadys.workers.dev"><img src="https://img.shields.io/badge/demo-ALPHA_Builders-FBBF24?style=flat" alt="ALPHA Builders demo" /></a>
+</p>
+
 ## Projeto em destaque
 
 ### [ALPHA Lab](https://github.com/Kadys-dv/ALPHA-Lab)

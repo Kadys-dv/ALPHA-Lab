@@ -1,18 +1,31 @@
 # ALPHA Lab
 
+[![Solidity Validation](https://github.com/Kadys-dv/ALPHA-Lab/actions/workflows/solidity-validation.yml/badge.svg)](https://github.com/Kadys-dv/ALPHA-Lab/actions/workflows/solidity-validation.yml)
+[![Frontend CI](https://github.com/Kadys-dv/ALPHA-Lab/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/Kadys-dv/ALPHA-Lab/actions/workflows/frontend-ci.yml)
+[![Live Demo](https://img.shields.io/badge/live_demo-ALPHA_Builders-FBBF24?style=flat&logo=cloudflare&logoColor=111827)](https://alpha-builders-web.cskadys.workers.dev)
+[![Base Sepolia](https://img.shields.io/badge/network-Base_Sepolia-38BDF8?style=flat)](https://sepolia.basescan.org/address/0xff15343aCcc4B77479EBE3C4cae32d99d4c60f48)
+
+<p align="center">
+  <img src="docs/alpha-lab-banner.svg" alt="ALPHA Lab: security, blockchain and product experimentation" width="100%" />
+</p>
+
 Projeto de segurança e experimentação em blockchain para desenvolver e validar um token utilitário ERC-20 em uma experiência de produto real.
 
 O ALPHA Lab entrega um token **ALPHA** de supply fixo e o **ALPHA Builders**, uma experiência pública para revisão e apresentação de projetos. A implementação combina Solidity, frontend web, automação e validações públicas, sem depender de venda ou especulação do token.
 
-## Em 30 segundos
+## Visão rápida
 
-- **Demo:** [ALPHA Builders](https://alpha-builders-web.cskadys.workers.dev)
-- **Contrato:** [ALPHA na BaseScan](https://sepolia.basescan.org/address/0xff15343aCcc4B77479EBE3C4cae32d99d4c60f48)
-- **Especialidade demonstrada:** segurança por restrição, blockchain e experimentação de produto.
-- **Stack:** Solidity, Hardhat 3, OpenZeppelin, Next.js, React, TypeScript, Base Sepolia e Cloudflare Workers.
-- **Status:** infraestrutura e experiência pública publicadas; validação de utilidade continua em andamento.
+| | |
+|---|---|
+| **Demo** | [ALPHA Builders](https://alpha-builders-web.cskadys.workers.dev) |
+| **Contrato** | [ALPHA na BaseScan](https://sepolia.basescan.org/address/0xff15343aCcc4B77479EBE3C4cae32d99d4c60f48) |
+| **Foco** | Segurança por restrição, blockchain e experimentação de produto |
+| **Stack** | Solidity, Hardhat 3, OpenZeppelin, Next.js, React, TypeScript, Base Sepolia e Cloudflare Workers |
+| **Status** | Infraestrutura e experiência pública publicadas; validação de utilidade em andamento |
 
-## O que foi entregue
+> Uma hipótese de produto, um contrato limitado e evidências públicas para cada etapa.
+
+## Entregas verificáveis
 
 | Resultado | Evidência |
 |---|---|
