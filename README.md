@@ -18,13 +18,14 @@ O contrato já está publicado e validado em testnet. ALPHA não está à venda,
 | Submissão de contribuições | GitHub Issue real |
 | Validação técnica de submissões | GitHub Actions |
 | Aprovação final | Revisão humana |
+| Build Cloudflare Workers | Preparado via vinext |
 | Venda, liquidez e mainnet | Bloqueadas |
 
 ## ALPHA Builders
 
 Experiência pública atual: https://alpha-builders.kadys-v2.chatgpt.site
 
-A pasta `web/` agora contém uma fonte canônica e reproduzível do ALPHA Builders, construída a partir do comportamento validado da versão publicada. Ela preserva a identidade neo-brutalista, animações com Framer Motion, elemento 3D com React Three Fiber/Drei, carteira EVM, Base Sepolia, desafio de README, métricas públicas de produto e histórico de Builders aceitos.
+A pasta `web/` contém a fonte canônica e reproduzível do ALPHA Builders, construída a partir do comportamento validado da versão publicada. Ela preserva a identidade neo-brutalista, animações com Framer Motion, elemento 3D com React Three Fiber/Drei, carteira EVM, Base Sepolia, desafio de README, métricas públicas de produto e histórico de Builders aceitos.
 
 A fonte em `web/` não é apresentada como recuperação byte-a-byte dos arquivos originais do host anterior; ela é a implementação versionada que passa a servir como referência de desenvolvimento daqui em diante.
 
@@ -34,7 +35,7 @@ O fluxo de carteira permanece deliberadamente sem operações financeiras: não 
 
 ```bash
 cd web
-npm install
+npm ci
 npm run lint
 npm run typecheck
 npm test
@@ -42,7 +43,15 @@ npm run build
 npm run dev
 ```
 
-O CI gera um lockfile quando ele ainda não estiver presente e usa `npm ci` na própria execução. O próximo merge que estabilizar as dependências deverá manter `web/package-lock.json` versionado para eliminar esse bootstrap temporário.
+`web/package-lock.json` está versionado. A CI exige instalação reproduzível com `npm ci`; não há mais bootstrap temporário de lockfile.
+
+Para validar também o bundle preparado para Cloudflare Workers:
+
+```bash
+npm run build:vinext
+```
+
+A integração com vinext é adicional e não substitui os comandos Next.js canônicos.
 
 ## Pipeline de contribuições
 
@@ -63,6 +72,8 @@ A aprovação `accepted` permanece uma decisão humana. A seção pública de Bu
 O frontend expõe `/api/version`, com versão, Chain ID, contrato e SHA de commit quando o ambiente de hospedagem fornece `VERCEL_GIT_COMMIT_SHA`, `GITHUB_SHA` ou `NEXT_PUBLIC_GIT_SHA`. O CI injeta `NEXT_PUBLIC_GIT_SHA` durante o build.
 
 A URL atual em `chatgpt.site` ainda não é controlada por este repositório, então ela não pode ser retroativamente vinculada a um commit. Novos deploys reproduzíveis devem partir da fonte `web/` e publicar o SHA pelo endpoint de versão.
+
+A fonte também está preparada para uma implantação independente em Cloudflare Workers usando vinext, Workers Cache e sem KV ou Cloudflare Images no primeiro deploy. A URL canônica só deve mudar depois de um deploy independente validado por smoke test.
 
 ## Deploy público do contrato
 
@@ -132,6 +143,7 @@ As métricas prioritárias são de produto: submissões, itens em revisão, cont
 - [Estratégia de monetização](docs/MONETIZATION.md)
 - [Hipótese de produto ALPHA Builders](docs/PRODUCT.md)
 - [Frontend e pipeline](docs/FRONTEND.md)
+- [Cloudflare Workers](docs/CLOUDFLARE.md)
 - [Roteiro de descoberta](docs/DISCOVERY.md)
 - [Roadmap](docs/ROADMAP.md)
 - [Política de segurança](docs/SECURITY.md)

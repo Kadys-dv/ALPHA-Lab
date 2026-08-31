@@ -27,7 +27,8 @@ Principais capacidades versionadas:
 - métricas públicas de produto derivadas de Issues;
 - seção pública de Builders aceitos;
 - endpoint `/api/version` para rastreabilidade de deploy;
-- fallback para `prefers-reduced-motion`.
+- fallback para `prefers-reduced-motion`;
+- bundle adicional para Cloudflare Workers via vinext.
 
 ## Segurança preservada
 
@@ -58,6 +59,9 @@ ALPHA-Lab/
     scripts/
     tests/
     package.json
+    package-lock.json
+    vite.config.ts
+    wrangler.jsonc
 ```
 
 ## CI do frontend
@@ -73,13 +77,26 @@ npm run build
 npm audit --omit=dev --audit-level=high
 ```
 
-Como o frontend foi introduzido sem um lockfile recuperável do host anterior, o workflow atual cria um `package-lock.json` temporário quando ele não existe e então executa `npm ci`. Esse bootstrap deve desaparecer assim que um `web/package-lock.json` validado for versionado.
+`web/package-lock.json` está versionado e é obrigatório. A CI usa `npm ci` diretamente; não há geração temporária de lockfile.
+
+`.github/workflows/cloudflare-build.yml` adiciona um gate específico de portabilidade:
+
+```bash
+npm ci
+npm run build:vinext
+```
+
+Esse gate não substitui o build Next.js; os dois precisam permanecer válidos.
 
 ## Smoke test
 
-`.github/workflows/frontend-smoke.yml` verifica a URL pública e exige marcadores de ALPHA/Base Sepolia, além de rejeitar marcadores explícitos de Mainnet, compra, swap ou staking.
+`.github/workflows/frontend-smoke.yml` compila e inicia a fonte canônica em ambiente efêmero, valida marcadores de ALPHA/Base Sepolia e o endpoint de versão. A URL legada também pode ser sondada sem bloquear a CI canônica.
 
-O smoke testa a disponibilidade da implantação atual, mas não prova que `chatgpt.site` foi gerado pelo commit do repositório. Essa limitação permanece até a hospedagem passar a fazer deploy diretamente da fonte `web/`.
+O host `chatgpt.site` não prova associação retroativa a um commit. Essa limitação só desaparece quando a URL canônica passar a ser publicada diretamente a partir de `web/`.
+
+## Cloudflare Workers
+
+A configuração de portabilidade usa vinext como camada adicional, preservando os scripts Next.js originais. O primeiro deploy foi deliberadamente preparado sem KV e sem Cloudflare Images, usando Workers Cache para CDN. Detalhes estão em `docs/CLOUDFLARE.md`.
 
 ## Contribuições
 
@@ -121,4 +138,4 @@ A avaliação de produto deve priorizar submissão, conclusão, aceitação e re
 
 `/api/version` retorna `version`, `chainId`, `contract` e o SHA disponível no ambiente. O build de CI injeta `NEXT_PUBLIC_GIT_SHA`.
 
-A URL atual em `chatgpt.site` não oferece, por meio deste repositório, controle de deploy ou associação retroativa a um commit. Novos deploys reproduzíveis devem ser feitos a partir de `web/`.
+A URL atual em `chatgpt.site` não oferece, por meio deste repositório, controle de deploy ou associação retroativa a um commit. A futura URL canônica independente deve ser publicada a partir de `web/` e validada por smoke test antes de substituir o host legado.
