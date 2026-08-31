@@ -14,11 +14,6 @@ type NavigatorWithHints = Navigator & {
   deviceMemory?: number;
 };
 
-type IdleWindow = Window & {
-  requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number;
-  cancelIdleCallback?: (handle: number) => void;
-};
-
 function supportsWebGL() {
   try {
     const canvas = document.createElement("canvas");
@@ -33,6 +28,8 @@ export default function PerformanceAwareAlpha() {
   const [allow3d, setAllow3d] = useState(false);
 
   useEffect(() => {
+    if (reducedMotion) return;
+
     const nav = navigator as NavigatorWithHints;
     const constrained =
       nav.connection?.saveData === true ||
@@ -42,15 +39,29 @@ export default function PerformanceAwareAlpha() {
 
     if (constrained) return;
 
-    const idleWindow = window as IdleWindow;
-    const idle = idleWindow.requestIdleCallback?.(() => setAllow3d(true), { timeout: 1600 });
-    const timer = idle === undefined ? window.setTimeout(() => setAllow3d(true), 700) : undefined;
+    let activated = false;
+    const activate = () => {
+      if (activated) return;
+      activated = true;
+      setAllow3d(true);
+      window.removeEventListener("pointerdown", activate);
+      window.removeEventListener("touchstart", activate);
+      window.removeEventListener("keydown", activate);
+      window.removeEventListener("scroll", activate);
+    };
+
+    window.addEventListener("pointerdown", activate, { passive: true, once: true });
+    window.addEventListener("touchstart", activate, { passive: true, once: true });
+    window.addEventListener("keydown", activate, { once: true });
+    window.addEventListener("scroll", activate, { passive: true, once: true });
 
     return () => {
-      if (idle !== undefined) idleWindow.cancelIdleCallback?.(idle);
-      if (timer !== undefined) window.clearTimeout(timer);
+      window.removeEventListener("pointerdown", activate);
+      window.removeEventListener("touchstart", activate);
+      window.removeEventListener("keydown", activate);
+      window.removeEventListener("scroll", activate);
     };
-  }, []);
+  }, [reducedMotion]);
 
   if (reducedMotion) {
     return <div className="alpha-orb-fallback" aria-hidden="true" />;
