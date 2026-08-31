@@ -2,6 +2,26 @@
 
 Esta fase publica a ALPHA somente em uma rede pública de testes. Não usa Base Mainnet nem dinheiro real.
 
+## Primeiro deploy público validado
+
+- Data: 2026-08-31
+- Rede: Base Sepolia
+- Chain ID: `84532`
+- Contrato ALPHA: `0xff15343aCcc4B77479EBE3C4cae32d99d4c60f48`
+- Deployer: `0xdb854d4D76a213740621e0dFa48de9BF7836c273`
+- Bytecode publicado: `1793 bytes`
+- Nome: `Alpha`
+- Símbolo: `ALPHA`
+- Decimais: `18`
+- Supply: `100000000000000000000000000`
+- Distribuição inicial: `100%` para o deployer
+
+Explorer:
+
+```text
+https://sepolia.basescan.org/address/0xff15343aCcc4B77479EBE3C4cae32d99d4c60f48
+```
+
 ## Rede permitida
 
 - Rede: Base Sepolia

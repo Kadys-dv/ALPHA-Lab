@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-ALPHA é um projeto educacional independente para aprender ERC-20, carteiras, transações, deploy e redes de teste.
+ALPHA é um laboratório de token utilitário para aprender ERC-20 e validar uma futura camada de acesso e recompensas de um produto digital.
 
 ## Propriedades
 
@@ -32,3 +32,9 @@ O deployer recebe 100% do supply no momento do deploy. Em testnet, isso permite 
 ## Escopo atual
 
 Somente ambiente local e Base Sepolia. Mainnet está fora do escopo da v0.1.
+
+## Hipótese de utilidade
+
+Antes de qualquer mainnet, ALPHA deverá provar pelo menos uma utilidade que funcione sem expectativa de valorização, como acesso a recurso digital, desconto, licença, participação em comunidade ou recompensa por contribuição verificável.
+
+O token não representa participação societária, dívida, rendimento, dividendos ou direito sobre receita. Qualquer mudança nessa definição exige nova análise técnica e jurídica.

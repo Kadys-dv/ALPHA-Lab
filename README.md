@@ -1,6 +1,8 @@
 # ALPHA Lab
 
-Projeto independente e educacional para criar e estudar o token ERC-20 **Alpha (ALPHA)** sem gastar dinheiro real.
+Projeto independente para desenvolver e validar o token utilitário ERC-20 **Alpha (ALPHA)** sem gastar dinheiro real durante o laboratório.
+
+O objetivo comercial futuro não é prometer valorização do token. A estratégia é usar ALPHA como acesso e recompensa dentro de um produto digital; a receita deverá vir de utilidades reais, como serviços e assinaturas, inicialmente cobrados em reais.
 
 ## Estado da v0.1
 
@@ -15,6 +17,7 @@ Projeto independente e educacional para criar e estudar o token ERC-20 **Alpha (
 - sem proxy/upgrade
 - sem venda
 - alvo de rede pública: **Base Sepolia (testnet)**
+- contrato público validado: `0xff15343aCcc4B77479EBE3C4cae32d99d4c60f48`
 
 O contrato usa a implementação ERC-20 do OpenZeppelin Contracts.
 
@@ -84,6 +87,12 @@ npm run deploy:base-sepolia
 
 O ETH da Base Sepolia não possui valor real. O deploy nessa rede serve apenas para aprendizado.
 
+Contrato publicado e validado on-chain:
+
+```text
+https://sepolia.basescan.org/address/0xff15343aCcc4B77479EBE3C4cae32d99d4c60f48
+```
+
 ## Estrutura
 
 ```text
@@ -95,6 +104,7 @@ ALPHA-Lab/
 │   └── AlphaToken.ts
 ├── docs/
 │   ├── DESIGN.md
+│   ├── MONETIZATION.md
 │   ├── ROADMAP.md
 │   └── SECURITY.md
 ├── hardhat.config.ts
@@ -104,4 +114,4 @@ ALPHA-Lab/
 
 ## Importante
 
-ALPHA v0.1 é um laboratório. Não foi projetado como investimento, não promete rendimento e não está sendo vendido. Mainnet e dinheiro real estão explicitamente fora do escopo atual.
+ALPHA v0.1 é um laboratório. Não foi projetado como investimento, não promete rendimento e não está sendo vendido. Mainnet e dinheiro real estão explicitamente fora do escopo atual. O plano comercial e seus gates estão em `docs/MONETIZATION.md`.

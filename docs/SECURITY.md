@@ -11,6 +11,9 @@ Este projeto é educacional e não substitui auditoria profissional.
 5. O contrato não possui mint administrativo, taxa, blacklist, pause ou proxy.
 6. Testar localmente antes de Base Sepolia.
 7. Confirmar sempre que a rede selecionada é Base Sepolia (chain ID 84532) antes do deploy.
+8. Não anunciar rendimento, valorização, recompra ou retorno financeiro.
+9. Não custodiar dinheiro ou tokens de usuários no laboratório.
+10. Não criar liquidez, venda pública ou mainnet sem revisão específica.
 
 ## Se um dia houver mainnet
 

@@ -1,4 +1,4 @@
-# Roadmap educacional
+# Roadmap de validação
 
 ## Fase 1 — base do projeto
 
@@ -36,6 +36,27 @@
 - adicionar testes antiabuso
 - manter o supply de ALPHA imutável
 
+## Fase 5 — validação de produto sem custo
+
+- escolher um problema e um público específicos
+- publicar uma landing page gratuita com lista de espera
+- entrevistar pelo menos 20 usuários potenciais
+- obter 10 usuários de teste ativos
+- validar uma utilidade de ALPHA em Base Sepolia
+- medir ativação, retenção e uso da utilidade
+
+## Fase 6 — primeira receita sem venda do token
+
+- oferecer um serviço digital ou assinatura em reais
+- emitir nota e registrar receitas conforme a estrutura aplicável
+- usar ALPHA apenas como acesso, recompensa ou desconto
+- documentar termos, privacidade, riscos e suporte
+- reinvestir somente receita já recebida, sem aporte obrigatório do fundador
+
+## Gate anterior à mainnet
+
+Mainnet continua bloqueada até existir produto funcional, usuários reais, receita comprovada sem venda especulativa, revisão jurídica/tributária e orçamento para segurança e operação.
+
 ## Fora do escopo atual
 
 - mainnet
@@ -44,3 +65,5 @@
 - promessa de valorização
 - staking/rendimento
 - integração com outro projeto
+- promessa de lucro, preço mínimo ou recompra
+- marketing baseado em escassez ou valorização futura
