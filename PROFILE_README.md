@@ -3,7 +3,7 @@
 Sou desenvolvedor web e mobile. Construo produtos que conectam software, segurança, produto e experimentação prática.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Kadys-dv/ALPHA-Lab/docs/portfolio-showcase/docs/alpha-lab-banner.svg" alt="ALPHA Lab: security, blockchain and product experimentation" width="100%" />
+  <img src="https://raw.githubusercontent.com/Kadys-dv/ALPHA-Lab/c7df3cb4572ae5eacf9d259cc8d04da624dcca58/docs/alpha-lab-banner.svg" alt="ALPHA Lab: security, blockchain and product experimentation" width="100%" />
 </p>
 
 <p align="center">
