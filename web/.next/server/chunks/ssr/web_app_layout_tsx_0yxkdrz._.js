@@ -1,0 +1,3 @@
+module.exports=[74762,a=>{"use strict";var b=a.i(80516);a.s(["default",0,function({children:a}){return(0,b.jsx)("html",{lang:"pt-BR",children:(0,b.jsx)("body",{children:a})})},"metadata",0,{title:"ALPHA Builders",description:"Laboratório público para transformar projetos em evidências verificáveis de portfólio."}])},98556,function(a){a.n(a.i(74762))}];
+
+//# sourceMappingURL=web_app_layout_tsx_0yxkdrz._.js.map
