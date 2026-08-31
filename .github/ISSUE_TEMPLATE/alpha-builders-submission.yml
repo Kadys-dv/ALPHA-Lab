@@ -1,0 +1,36 @@
+name: ALPHA Builders submission
+description: Envie um projeto público para revisão estruturada de README.
+title: "[ALPHA Builders] README review submission"
+labels:
+  - submission
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Esta submissão é pública e voltada ao laboratório educacional ALPHA Builders em Base Sepolia.
+        Nunca envie chave privada, seed phrase, e-mail, documento ou outro dado pessoal sensível.
+  - type: input
+    id: repository
+    attributes:
+      label: Repository
+      description: URL HTTPS de um repositório público no GitHub.
+      placeholder: https://github.com/usuario/projeto
+    validations:
+      required: true
+  - type: input
+    id: wallet
+    attributes:
+      label: Wallet
+      description: Endereço EVM público usado apenas como identificador verificável de testnet.
+      placeholder: 0x0000000000000000000000000000000000000000
+    validations:
+      required: true
+  - type: checkboxes
+    id: consent
+    attributes:
+      label: Confirmações
+      options:
+        - label: O repositório é público e pode ser revisado.
+          required: true
+        - label: Não incluí chave privada, seed phrase ou dados pessoais sensíveis.
+          required: true

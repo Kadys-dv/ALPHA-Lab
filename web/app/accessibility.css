@@ -1,0 +1,7 @@
+.hero-copy{opacity:1!important}
+.site-footer{grid-template-columns:1fr;justify-items:center;text-align:center;gap:clamp(1rem,2.5vw,1.6rem)}
+.footer-brand{justify-content:center}
+.footer-brand div{text-align:center}
+.footer-links{justify-content:center;flex-wrap:wrap}
+.site-footer>p{justify-self:center;max-width:760px;text-align:center}
+.footer-credit{justify-content:center;align-items:center;flex-direction:column;text-align:center;gap:.45rem}

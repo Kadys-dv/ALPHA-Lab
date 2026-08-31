@@ -1,0 +1,6 @@
+import { ArrowUpRight } from "lucide-react";
+import { ALPHA_CONTRACT } from "@/lib/constants";
+const repositoryUrl="https://github.com/Kadys-dv/ALPHA-Lab";
+const explorerUrl=`https://sepolia.basescan.org/address/${ALPHA_CONTRACT}`;
+const profileUrl="https://www.linkedin.com/in/rodrigo-marcelo-dos-santos-2851a4429/";
+export default function SiteFooter(){return <footer className="site-footer"><div className="footer-brand"><span className="brand-mark">A</span><div><strong>ALPHA Builders</strong><small>Open source · Base Sepolia</small></div></div><div className="footer-links"><a href={repositoryUrl} target="_blank" rel="noreferrer">GitHub</a><a href={explorerUrl} target="_blank" rel="noreferrer">Contrato</a><a href="/participar">Participar</a><a href="/operations">Operação</a></div><p>ALPHA é um token experimental de testnet. Não está à venda, não representa participação societária, investimento ou promessa de retorno financeiro.</p><div className="footer-credit"><span>Desenvolvido por <a href={profileUrl} target="_blank" rel="noreferrer">Rodrigo.Dev <ArrowUpRight size={13}/></a></span><span>© {new Date().getFullYear()} ALPHA Builders. Todos os direitos reservados.</span></div></footer>}

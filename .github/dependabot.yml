@@ -1,0 +1,60 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/web"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: "America/Sao_Paulo"
+    open-pull-requests-limit: 5
+    versioning-strategy: increase-if-necessary
+    groups:
+      react-next:
+        patterns:
+          - "next"
+          - "react"
+          - "react-dom"
+          - "react-server-dom-webpack"
+          - "eslint-config-next"
+      cloudflare-vinext:
+        patterns:
+          - "vinext"
+          - "@vinext/cloudflare"
+          - "@cloudflare/vite-plugin"
+          - "wrangler"
+          - "vite"
+          - "@vitejs/*"
+      three-motion:
+        patterns:
+          - "three"
+          - "@react-three/*"
+          - "framer-motion"
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: "deps(web)"
+
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:30"
+      timezone: "America/Sao_Paulo"
+    open-pull-requests-limit: 3
+    versioning-strategy: increase-if-necessary
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: "deps(contract)"
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: "deps(actions)"

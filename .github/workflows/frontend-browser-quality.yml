@@ -1,0 +1,74 @@
+name: Frontend Browser Quality
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    paths:
+      - 'web/**'
+      - 'qa/**'
+      - '.github/workflows/frontend-browser-quality.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: alpha-browser-quality-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  browser-quality:
+    name: Frontend Browser Quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install canonical frontend
+        working-directory: web
+        run: npm ci --no-audit --no-fund
+
+      - name: Install pinned browser QA tools
+        run: npm install --no-save --package-lock=false --ignore-scripts @playwright/test@1.55.0 axe-core@4.10.3 @lhci/cli@0.15.1
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Build canonical frontend
+        working-directory: web
+        env:
+          NEXT_PUBLIC_GIT_SHA: ${{ github.sha }}
+        run: npm run build
+
+      - name: Start canonical frontend
+        working-directory: web
+        run: |
+          npm start -- --hostname 127.0.0.1 > /tmp/alpha-web.log 2>&1 &
+          echo $! > /tmp/alpha-web.pid
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:3000/ > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/alpha-web.log
+          exit 1
+
+      - name: Playwright and Axe
+        run: npx playwright test qa/alpha-builders.e2e.spec.mjs --workers=1 --reporter=line
+
+      - name: Lighthouse budgets
+        run: npx lhci autorun --config=web/lighthouserc.json
+
+      - name: Show server log on failure
+        if: failure()
+        run: cat /tmp/alpha-web.log || true

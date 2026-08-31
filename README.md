@@ -2,83 +2,102 @@
 
 Projeto de segurança e experimentação em blockchain para desenvolver e validar um token utilitário ERC-20 em uma experiência de produto real.
 
-O projeto entrega um token **ALPHA** de supply fixo, publicado na Base Sepolia, com foco em testar uma hipótese: usar recompensas e benefícios para ajudar desenvolvedores iniciantes a concluir e apresentar projetos de portfólio. A implementação prioriza invariantes verificáveis, limites explícitos e ausência de privilégios administrativos. A etapa atual é de descoberta e validação, não de venda ou investimento.
+O ALPHA Lab entrega um token **ALPHA** de supply fixo e o **ALPHA Builders**, uma experiência pública para revisão e apresentação de projetos. A implementação combina Solidity, frontend web, automação e validações públicas, sem depender de venda ou especulação do token.
 
 ## Em 30 segundos
 
-- **Entrega:** contrato ERC-20, testes, guardas de segurança, deploy local e deploy público em testnet.
-- **Especialidade demonstrada:** modelagem de risco, segurança por restrição e experimentação de produto em blockchain.
-- **Demo on-chain:** [ver contrato na BaseScan](https://sepolia.basescan.org/address/0xff15343aCcc4B77479EBE3C4cae32d99d4c60f48).
-- **Rede:** Base Sepolia, Chain ID `84532`.
-- **Stack:** Solidity `0.8.34`, Hardhat 3, OpenZeppelin Contracts, Hardhat Ignition e npm.
-- **Status:** infraestrutura validada; utilidade do produto ainda em descoberta.
+- **Demo:** [ALPHA Builders](https://alpha-builders-web.cskadys.workers.dev)
+- **Contrato:** [ALPHA na BaseScan](https://sepolia.basescan.org/address/0xff15343aCcc4B77479EBE3C4cae32d99d4c60f48)
+- **Especialidade demonstrada:** segurança por restrição, blockchain e experimentação de produto.
+- **Stack:** Solidity, Hardhat 3, OpenZeppelin, Next.js, React, TypeScript, Base Sepolia e Cloudflare Workers.
+- **Status:** infraestrutura e experiência pública publicadas; validação de utilidade continua em andamento.
 
 ## O que foi entregue
 
 | Resultado | Evidência |
 |---|---|
 | Token ERC-20 com supply fixo | `100.000.000 ALPHA`, mint único no construtor |
-| Contrato público | [endereço verificado na Base Sepolia](https://sepolia.basescan.org/address/0xff15343aCcc4B77479EBE3C4cae32d99d4c60f48) |
-| Validação de configuração | 18 invariantes de código/configuração aprovadas |
-| Cobertura do contrato | 7 testes Solidity documentados |
-| Reprodutibilidade | `npm ci`, build e deploy local via Hardhat |
-| Limites de segurança | sem owner/admin, mint posterior, taxa, pause, proxy ou upgrade |
+| Segurança do contrato | 18 invariantes de código/configuração e 7 testes Solidity |
+| Deploy público | Base Sepolia, Chain ID `84532`, metadados e supply conferidos on-chain |
+| Produto funcional | ALPHA Builders publicado no Cloudflare Workers |
+| Fluxo de contribuição | Issues públicas, validação automática e aprovação humana |
+| Qualidade frontend | lint, TypeScript, Vitest, Playwright, Axe e Lighthouse CI |
+| Operação rastreável | endpoints de status/versão, SHA de commit e smoke de produção |
 
 ## Como funciona
 
 ```mermaid
 flowchart LR
-    A[Projeto do participante] --> B[Entrega verificável]
-    B --> C[Revisão ou aprovação]
-    C --> D[Recompensa ALPHA de testnet]
-    D --> E[Benefício experimental]
-    E --> F[Medição de uso e resultado]
+    A[Projeto público] --> B[Issue de submissão]
+    B --> C[Validação automática]
+    C --> D[Revisão humana]
+    D --> E[Perfil público do Builder]
+    E --> F[Métricas de produto]
 ```
 
-O contrato registra a camada de token. A utilidade, a revisão de projetos e a medição do piloto ficam fora do contrato principal para manter o experimento simples e seguro.
+O contrato registra a camada de token. A revisão, a evidência pública, os perfis e as métricas ficam no frontend e na automação para manter o contrato simples e o experimento observável.
+
+## Segurança e limites
+
+- supply fixo e mint único no construtor;
+- sem owner/admin, mint posterior, taxa, blacklist, pause, proxy ou upgrade;
+- sem compra, transferência financeira, `approve`, swap, bridge, staking ou integração com Base Mainnet;
+- aprovação de contribuições sempre depende de revisão humana;
+- chaves privadas nunca são versionadas ou usadas no frontend.
 
 ## O que foi validado
 
-- O bytecode foi publicado na Base Sepolia.
-- `name = Alpha`, `symbol = ALPHA` e `decimals = 18` foram conferidos on-chain.
-- O supply inicial foi confirmado no endereço do deployer.
-- O código não possui mecanismos de emissão posterior, administração privilegiada ou upgrade.
-- O guard de fonte cobre 18 invariantes e passa localmente.
+- bytecode publicado na Base Sepolia;
+- `name = Alpha`, `symbol = ALPHA` e `decimals = 18` conferidos on-chain;
+- supply inicial confirmado no deployer;
+- build do frontend e bundle Cloudflare validados;
+- testes de acessibilidade, navegador, SEO e performance configurados na CI;
+- produção verifica o SHA implantado, a rede, o contrato e a ausência de CTAs financeiros proibidos.
 
 ## O que ainda falta
 
-- Entrevistar 20 usuários potenciais.
-- Publicar a landing page e a lista de espera.
-- Construir a primeira utilidade fora do contrato.
-- Executar o piloto com usuários ativos e medir ativação, retenção e custo.
-- Validar receita independente da especulação do token.
-
-Mainnet, venda pública, liquidez, staking e promessa de rendimento permanecem fora do escopo até que produto, segurança, conformidade e operação sejam comprovados.
+- entrevistar 20 usuários potenciais;
+- medir submissões, aceitação, repetição de uso e custo operacional;
+- validar a primeira utilidade fora do contrato;
+- testar receita independente da especulação do token;
+- cumprir os gates de produto, segurança, conformidade e operação antes de considerar mainnet.
 
 ## Executar localmente
 
-Requisitos: Node.js `22.13.0` ou superior, npm e Git.
+Contrato:
 
 ```bash
 npm ci
 npm run validate
 ```
 
-Comandos individuais:
+Frontend:
 
 ```bash
-npm run guard
-npm run build
+cd web
+npm ci
+npm run lint
+npm run typecheck
 npm test
-npm run deploy:local
+npm run build
+npm run dev
+```
+
+Para validar o bundle Cloudflare:
+
+```bash
+npm run build:vinext
 ```
 
 ## Documentação
 
 - [Desenho do token](docs/DESIGN.md)
 - [Deploy e evidências da Base Sepolia](docs/BASE-SEPOLIA.md)
+- [Frontend e pipeline](docs/FRONTEND.md)
+- [Cloudflare Workers](docs/CLOUDFLARE.md)
+- [Produção](docs/PRODUCTION.md)
+- [Métricas](docs/METRICS.md)
 - [Hipótese de produto ALPHA Builders](docs/PRODUCT.md)
-- [Roteiro de descoberta](docs/DISCOVERY.md)
 - [Roadmap de validação](docs/ROADMAP.md)
 - [Política de segurança](docs/SECURITY.md)
 

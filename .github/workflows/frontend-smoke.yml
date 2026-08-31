@@ -1,0 +1,56 @@
+name: Frontend Smoke
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    paths:
+      - 'web/**'
+      - '.github/workflows/frontend-smoke.yml'
+  workflow_dispatch:
+  schedule:
+    - cron: '17 9 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: alpha-smoke-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    name: Frontend Smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install
+        run: npm ci --no-audit --no-fund
+      - name: Build canonical frontend
+        env:
+          NEXT_PUBLIC_GIT_SHA: ${{ github.sha }}
+        run: npm run build
+      - name: Start canonical frontend
+        run: |
+          npm start -- --hostname 127.0.0.1 --port 3000 > /tmp/alpha-builders-next.log 2>&1 &
+          echo $! > /tmp/alpha-builders-next.pid
+      - name: Verify canonical deployment markers and version metadata
+        env:
+          PUBLIC_SITE_URL: http://127.0.0.1:3000
+        run: npm run smoke
+      - name: Probe legacy public host without blocking canonical CI
+        if: always()
+        run: |
+          node -e "fetch('https://alpha-builders.kadys-v2.chatgpt.site',{redirect:'follow'}).then(r=>console.log('legacy-host-status='+r.status)).catch(e=>console.log('legacy-host-unreachable='+e.message))"
+      - name: Show server log on failure
+        if: failure()
+        run: cat /tmp/alpha-builders-next.log || true

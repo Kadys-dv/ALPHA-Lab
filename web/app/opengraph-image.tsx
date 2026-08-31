@@ -1,0 +1,5 @@
+import { ImageResponse } from "next/og";
+export const alt="ALPHA Builders — Aprenda construindo. Prove contribuindo.";
+export const size={width:1200,height:630};
+export const contentType="image/png";
+export default function Image(){return new ImageResponse(<div style={{width:"100%",height:"100%",display:"flex",flexDirection:"column",justifyContent:"space-between",padding:"72px",background:"#09090b",color:"#f7f5f1",fontFamily:"sans-serif",border:"18px solid #67e8f9"}}><div style={{display:"flex",justifyContent:"space-between",fontSize:28,fontWeight:800}}><span>ALPHA BUILDERS / LAB</span><span style={{color:"#67e8f9"}}>BASE SEPOLIA · 84532</span></div><div style={{display:"flex",flexDirection:"column"}}><span style={{fontSize:82,fontWeight:900,letterSpacing:"-5px",lineHeight:.95}}>Aprenda construindo.</span><span style={{fontSize:82,fontWeight:900,letterSpacing:"-5px",lineHeight:.95,color:"#c084fc"}}>Prove contribuindo.</span></div><div style={{display:"flex",justifyContent:"space-between",fontSize:24}}><span>Open source · evidência pública · revisão humana</span><span>Rodrigo.Dev</span></div></div>,size)}
