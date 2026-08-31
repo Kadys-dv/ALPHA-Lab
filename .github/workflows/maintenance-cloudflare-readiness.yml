@@ -11,7 +11,7 @@ jobs:
   migrate:
     if: github.event.issue.title == '[maintenance] cloudflare migrate'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     defaults:
       run:
         working-directory: web
@@ -26,10 +26,16 @@ jobs:
           cache-dependency-path: web/package-lock.json
       - name: Install canonical frontend
         run: npm ci --no-audit --no-fund
+      - name: Upgrade Vitest for Vite 8 compatibility
+        run: npm install -D vitest@4.1.11 --save-exact --no-audit --no-fund
       - name: Initialize vinext for Cloudflare Workers
         run: npx --yes vinext@latest init --skip-check --platform=cloudflare --cdn-cache=workers-cache --data-cache=none --image-optimization=none --no-prerender
       - name: Build with vinext
         run: npm run build:vinext
+      - name: Run existing tests
+        run: npm test
+      - name: Build with Next.js
+        run: npm run build
       - name: Commit Cloudflare readiness changes
         working-directory: .
         run: |
