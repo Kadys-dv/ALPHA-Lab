@@ -15,6 +15,8 @@ O contrato já está publicado e validado em testnet. ALPHA não está à venda,
 | ALPHA Builders | Publicado no Cloudflare Workers |
 | Fonte canônica do frontend | Versionada em `web/` |
 | Utilidade inicial | Revisão estruturada de README |
+| Evidência aceita | Repositório ou Pull Request público |
+| Perfis públicos de Builders | `/builders/[issue]` |
 | Submissão de contribuições | GitHub Issue real |
 | Validação técnica de submissões | GitHub Actions |
 | Aprovação final | Revisão humana |
@@ -27,6 +29,8 @@ O contrato já está publicado e validado em testnet. ALPHA não está à venda,
 Experiência pública canônica: https://alpha-builders-web.cskadys.workers.dev
 
 A pasta `web/` contém a fonte canônica e reproduzível do ALPHA Builders. A experiência atual segue a direção **Interactive Storytelling + Neo-Brutalismo Tátil**, com hero “Aprenda construindo. Prove contribuindo.”, animações com Framer Motion, núcleo 3D com React Three Fiber/Drei, carteira EVM, Base Sepolia, desafio de README, prova técnica, métricas públicas de produto e histórico de Builders aceitos.
+
+O núcleo 3D é carregado sob demanda e possui fallback adaptativo para `prefers-reduced-motion`, economia de dados, pouca memória, viewport pequena ou ausência de WebGL. O build de produção separa o componente 3D do bundle principal da experiência.
 
 O host anterior em `chatgpt.site` é apenas legado e não é mais a URL canônica do projeto.
 
@@ -56,7 +60,7 @@ A integração com vinext é adicional e não substitui os comandos Next.js can�
 
 ## Pipeline de contribuições
 
-Submissões do ALPHA Builders são Issues públicas. A automação:
+Submissões do ALPHA Builders são Issues públicas. O frontend aceita como evidência a URL pública de um repositório ou de um Pull Request do GitHub e normaliza a evidência para o repositório correspondente. A automação:
 
 1. reconhece Issues com título `[ALPHA Builders]`;
 2. valida URL de repositório GitHub;
@@ -66,13 +70,29 @@ Submissões do ALPHA Builders são Issues públicas. A automação:
 6. aplica estados técnicos como `valid`, `invalid`, `needs-review` e `under-review`;
 7. nunca aplica `accepted` automaticamente.
 
-A aprovação `accepted` permanece uma decisão humana. A seção pública de Builders consome apenas dados públicos sanitizados de Issues aceitas.
+A aprovação `accepted` permanece uma decisão humana. Builders aceitos ganham um perfil público sanitizado em `/builders/[issue]`, com projeto, evidência, carteira abreviada, Issue e data de validação.
+
+## Métricas de produto
+
+`/api/status` deriva dados exclusivamente de Issues públicas e expõe:
+
+- submissões;
+- itens em revisão;
+- contribuições aceitas;
+- taxa de aceite;
+- Builders únicos;
+- projetos distintos;
+- até 12 Builders aceitos com links para evidência e perfil público.
+
+Nenhum contador de tração é inventado localmente e métricas do token não substituem validação de produto.
 
 ## Rastreabilidade e produção
 
 O frontend expõe `/api/version`, com versão, Chain ID, contrato e SHA de commit. O deploy Cloudflare injeta `NEXT_PUBLIC_GIT_SHA` e valida depois da publicação que o SHA servido em produção é exatamente o commit implantado.
 
 `.github/workflows/cloudflare-deploy.yml` publica automaticamente quando `web/**` muda na `main` e mantém também um disparo manual protegido. Antes do deploy ele executa instalação reproduzível, lint, TypeScript strict, testes, build Next.js, audit e build vinext. Depois do deploy valida a página pública, o hero atual, Base Sepolia, `/api/version`, `/api/status`, Chain ID, contrato e ausência de CTAs financeiros proibidos.
+
+O frontend também publica `robots.txt`, `sitemap.xml`, metadata canônica/Open Graph e um skip link para navegação por teclado.
 
 `.github/workflows/cloudflare-production-smoke.yml` mantém um smoke real da URL pública.
 
@@ -135,7 +155,7 @@ Nunca envie seed phrase ou chave privada pelo chat, por issue, commit, `.env` ve
 
 O ALPHA Builders testa utilidade sem depender de venda ou valorização do token. A primeira utilidade escolhida é a revisão estruturada de README, com evidências públicas e submissões rastreáveis por GitHub.
 
-As métricas prioritárias são de produto: submissões, itens em revisão, contribuições aceitas, conclusão e uso repetido. Métricas do token não substituem validação de utilidade.
+As métricas prioritárias são de produto: submissão, revisão, aceitação, diversidade de projetos e repetição de uso. Métricas do token não substituem validação de utilidade.
 
 ## Documentação
 
