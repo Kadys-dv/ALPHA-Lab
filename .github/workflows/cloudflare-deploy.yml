@@ -70,7 +70,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          root="$(curl --fail --silent --show-error --retry 8 --retry-delay 2 --retry-all-errors "$PRODUCTION_URL/")"
+
+          root="$(curl --fail --silent --show-error --retry 8 --retry-delay 2 --retry-all-errors "$PRODUCTION_URL/?verify=$GITHUB_SHA")"
           printf '%s' "$root" | grep -Fq 'ALPHA'
           printf '%s' "$root" | grep -Fq 'Base Sepolia'
           printf '%s' "$root" | grep -Fq 'Aprenda construindo.'
@@ -79,8 +80,30 @@ jobs:
           ! printf '%s' "$root" | grep -Fq 'Swap ALPHA'
           ! printf '%s' "$root" | grep -Fq 'Stake ALPHA'
 
-          curl --fail --silent --show-error --retry 8 --retry-delay 2 --retry-all-errors "$PRODUCTION_URL/api/version" > /tmp/version.json
-          curl --fail --silent --show-error --retry 8 --retry-delay 2 --retry-all-errors "$PRODUCTION_URL/api/status" > /tmp/status.json
+          matched=false
+          for attempt in $(seq 1 20); do
+            probe="$PRODUCTION_URL/api/version?verify=$GITHUB_SHA&attempt=$attempt"
+            if curl --fail --silent --show-error --header 'Cache-Control: no-cache' "$probe" > /tmp/version.json; then
+              deployed_sha="$(node -e "const fs=require('fs');const v=JSON.parse(fs.readFileSync('/tmp/version.json','utf8'));process.stdout.write(String(v.commit||''))")"
+              if [ "$deployed_sha" = "$GITHUB_SHA" ]; then
+                echo "Deployment SHA propagated on attempt $attempt: $deployed_sha"
+                matched=true
+                break
+              fi
+              echo "Waiting for Cloudflare propagation: expected $GITHUB_SHA, got ${deployed_sha:-missing} (attempt $attempt/20)"
+            else
+              echo "Version endpoint not ready yet (attempt $attempt/20)"
+            fi
+            sleep 4
+          done
+
+          if [ "$matched" != true ]; then
+            echo "Deployment SHA did not propagate within the verification window"
+            cat /tmp/version.json || true
+            exit 1
+          fi
+
+          curl --fail --silent --show-error --retry 8 --retry-delay 2 --retry-all-errors --header 'Cache-Control: no-cache' "$PRODUCTION_URL/api/status?verify=$GITHUB_SHA" > /tmp/status.json
 
           node <<'NODE'
           const fs = require('fs');
