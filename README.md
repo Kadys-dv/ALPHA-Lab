@@ -21,16 +21,18 @@ O contrato já está publicado e validado em testnet. ALPHA não está à venda,
 | Validação técnica de submissões | GitHub Actions |
 | Aprovação final | Revisão humana |
 | Build Cloudflare Workers | Validado via vinext |
-| Deploy de produção | Automático em mudanças de `web/**` na `main` |
+| Browser QA | Playwright + Axe |
+| Quality budgets | Lighthouse CI |
+| Deploy de produção | Automático em mudanças de `web/**` ou do workflow de deploy na `main` |
 | Venda, liquidez e mainnet | Bloqueadas |
 
 ## ALPHA Builders
 
 Experiência pública canônica: https://alpha-builders-web.cskadys.workers.dev
 
-A pasta `web/` contém a fonte canônica e reproduzível do ALPHA Builders. A experiência atual segue a direção **Interactive Storytelling + Neo-Brutalismo Tátil**, com hero “Aprenda construindo. Prove contribuindo.”, animações com Framer Motion, núcleo 3D com React Three Fiber/Drei, carteira EVM, Base Sepolia, desafio de README, prova técnica, métricas públicas de produto e histórico de Builders aceitos.
+A pasta `web/` contém a fonte canônica e reproduzível do ALPHA Builders. A experiência atual segue a direção **Interactive Storytelling + Neo-Brutalismo Tátil**, com hero “Aprenda construindo. Prove contribuindo.”, Framer Motion, núcleo 3D com React Three Fiber/Three.js, carteira EVM, Base Sepolia, desafio de README, prova técnica, métricas públicas de produto e histórico de Builders aceitos.
 
-O núcleo 3D é carregado sob demanda e possui fallback adaptativo para `prefers-reduced-motion`, economia de dados, pouca memória, viewport pequena ou ausência de WebGL. O build de produção separa o componente 3D do bundle principal da experiência.
+O núcleo 3D é carregado sob demanda e possui fallback adaptativo para `prefers-reduced-motion`, economia de dados, pouca memória, viewport pequena ou ausência de WebGL. A cena lazy não depende mais dos helpers de Drei em runtime e permanece isolada do bundle principal.
 
 O host anterior em `chatgpt.site` é apenas legado e não é mais a URL canônica do projeto.
 
@@ -58,6 +60,19 @@ npm run build:vinext
 
 A integração com vinext é adicional e não substitui os comandos Next.js canônicos.
 
+## Qualidade de navegador
+
+Além de lint, TypeScript, Vitest e build, o projeto possui `.github/workflows/frontend-browser-quality.yml`.
+
+Esse gate inicia a aplicação canônica e executa:
+
+- Playwright em Chromium;
+- navegação por teclado e skip link;
+- submissão válida por Pull Request com carteira EVM mockada;
+- rejeição de evidência fora do `github.com`;
+- Axe com WCAG 2 A/AA, bloqueando violações sérias ou críticas;
+- Lighthouse CI com budgets mínimos de 85% para performance e 95% para acessibilidade, best practices e SEO.
+
 ## Pipeline de contribuições
 
 Submissões do ALPHA Builders são Issues públicas. O frontend aceita como evidência a URL pública de um repositório ou de um Pull Request do GitHub e normaliza a evidência para o repositório correspondente. A automação:
@@ -70,9 +85,9 @@ Submissões do ALPHA Builders são Issues públicas. O frontend aceita como evid
 6. aplica estados técnicos como `valid`, `invalid`, `needs-review` e `under-review`;
 7. nunca aplica `accepted` automaticamente.
 
-A aprovação `accepted` permanece uma decisão humana. Builders aceitos ganham um perfil público sanitizado em `/builders/[issue]`, com projeto, evidência, carteira abreviada, Issue e data de validação.
+A aprovação `accepted` permanece uma decisão humana. Builders aceitos ganham um perfil público sanitizado em `/builders/[issue]`, com projeto, evidência, carteira abreviada, Issue, critérios verificáveis e histórico de submissão → análise → aceitação.
 
-## Métricas de produto
+## Métricas de produto e disponibilidade
 
 `/api/status` deriva dados exclusivamente de Issues públicas e expõe:
 
@@ -82,19 +97,27 @@ A aprovação `accepted` permanece uma decisão humana. Builders aceitos ganham 
 - taxa de aceite;
 - Builders únicos;
 - projetos distintos;
+- Builders recorrentes;
+- aceites por Builder;
 - até 12 Builders aceitos com links para evidência e perfil público.
 
-Nenhum contador de tração é inventado localmente e métricas do token não substituem validação de produto.
+O endpoint diferencia `ok`, `partial` e `unavailable`. Se a API pública do GitHub estiver indisponível ou limitada, valores ausentes ficam `null` e a interface mostra `—`; falha externa nunca é convertida em um zero falso. `checkedAt` registra quando a fonte pública foi consultada.
+
+## Performance
+
+O build Cloudflare da fase atual manteve o bundle principal `AlphaBuildersApp` em aproximadamente **149,38 kB minificado / 48,35 kB gzip**. O 3D permanece em chunk lazy separado, aproximadamente **840,52 kB / 222,51 kB gzip**, e só é habilitado em dispositivos capazes.
+
+A configuração do Next fixa explicitamente o `turbopack.root` em `web/`, removendo a ambiguidade de workspace que antes aparecia durante o build.
 
 ## Rastreabilidade e produção
 
 O frontend expõe `/api/version`, com versão, Chain ID, contrato e SHA de commit. O deploy Cloudflare injeta `NEXT_PUBLIC_GIT_SHA` e valida depois da publicação que o SHA servido em produção é exatamente o commit implantado.
 
-`.github/workflows/cloudflare-deploy.yml` publica automaticamente quando `web/**` muda na `main` e mantém também um disparo manual protegido. Antes do deploy ele executa instalação reproduzível, lint, TypeScript strict, testes, build Next.js, audit e build vinext. Depois do deploy valida a página pública, o hero atual, Base Sepolia, `/api/version`, `/api/status`, Chain ID, contrato e ausência de CTAs financeiros proibidos.
+`.github/workflows/cloudflare-deploy.yml` publica automaticamente quando `web/**` ou o próprio workflow de deploy muda na `main` e mantém também um disparo manual protegido. Antes do deploy ele executa instalação reproduzível, lint, TypeScript strict, testes, build Next.js, audit e build vinext.
 
-O frontend também publica `robots.txt`, `sitemap.xml`, metadata canônica/Open Graph e um skip link para navegação por teclado.
+Após a publicação, a verificação usa cache-busting e aguarda a propagação do `/api/version` por uma janela limitada, mas continua exigindo correspondência exata com `GITHUB_SHA`. Um SHA diferente após o timeout continua bloqueando o deploy. Também valida a página pública, Base Sepolia, `/api/status`, Chain ID, contrato e ausência de CTAs financeiros proibidos.
 
-`.github/workflows/cloudflare-production-smoke.yml` mantém um smoke real da URL pública.
+O frontend também publica `robots.txt`, `sitemap.xml`, metadata canônica/Open Graph e um skip link para navegação por teclado. `.github/workflows/cloudflare-production-smoke.yml` mantém um smoke real da URL pública.
 
 ## Deploy público do contrato
 
