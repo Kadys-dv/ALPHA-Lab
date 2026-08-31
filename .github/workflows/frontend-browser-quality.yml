@@ -2,10 +2,6 @@ name: Frontend Browser Quality
 
 on:
   pull_request:
-    paths:
-      - 'web/**'
-      - 'qa/**'
-      - '.github/workflows/frontend-browser-quality.yml'
   push:
     branches: [main]
     paths:
