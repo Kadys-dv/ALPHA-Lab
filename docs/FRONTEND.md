@@ -15,7 +15,7 @@ Principais capacidades versionadas:
 - Next.js App Router, React 19 e TypeScript strict;
 - direção visual Interactive Storytelling + Neo-Brutalismo Tátil;
 - hero “Aprenda construindo. Prove contribuindo.”;
-- React Three Fiber/Drei e Three.js com carregamento sob demanda;
+- React Three Fiber e Three.js com carregamento sob demanda;
 - fallback adaptativo do 3D para reduced motion, economia de dados, pouca memória, telas pequenas e ausência de WebGL;
 - Framer Motion;
 - layout responsivo;
@@ -34,59 +34,86 @@ Principais capacidades versionadas:
 - endpoint `/api/version` para rastreabilidade de deploy;
 - metadata canônica/Open Graph, `robots.txt` e `sitemap.xml`;
 - skip link para navegação por teclado;
+- Playwright, Axe e Lighthouse CI;
 - bundle e deploy para Cloudflare Workers via vinext.
+
+## Estrutura modular
+
+A aplicação principal continua em `components/AlphaBuildersApp.tsx`, mas responsabilidades com estado próprio foram extraídas para módulos independentes:
+
+```text
+web/
+  app/
+    api/status/
+    api/version/
+    builders/[issue]/
+  components/
+    builders/BuildersSection.tsx
+    submission/SubmissionSection.tsx
+    three/FloatingAlpha.tsx
+    three/PerformanceAwareAlpha.tsx
+  hooks/
+    useEvmWallet.ts
+    usePublicStatus.ts
+  lib/
+    builders.ts
+    validation.ts
+```
+
+`SubmissionSection` concentra validação e preparação da Issue. `BuildersSection` concentra métricas, disponibilidade da fonte pública e histórico aceito.
 
 ## Performance do 3D
 
-`components/three/PerformanceAwareAlpha.tsx` usa importação dinâmica para retirar React Three Fiber/Drei/Three.js do caminho crítico inicial. A cena completa só é habilitada em dispositivos capazes e depois de uma janela ociosa do navegador.
+`components/three/PerformanceAwareAlpha.tsx` usa importação dinâmica para retirar a cena completa do caminho crítico inicial. O 3D só é habilitado em dispositivos capazes e depois de uma janela ociosa do navegador.
 
-No build de produção validado do hardening, o bundle `AlphaBuildersApp` ficou em aproximadamente **147,63 kB minificado / 47,78 kB gzip**, enquanto `FloatingAlpha` apareceu em um chunk separado de aproximadamente **843,76 kB / 223,94 kB gzip**. O chunk 3D continua grande, mas é carregado sob demanda e possui fallback visual estático para dispositivos restritos.
+`FloatingAlpha.tsx` usa React Three Fiber/Three.js diretamente para animação, pointer response e materiais. Os helpers de Drei não são mais importados pelo runtime lazy da cena. A dependência ainda pode existir no manifesto do projeto enquanto sua remoção total não for tratada separadamente.
 
-A geometria da cena também foi reduzida: menor detalhe do icosaedro, menos segmentos nos torus, DPR máximo menor e intensidades ajustadas sem mudar a direção visual.
+No build Cloudflare validado desta fase:
 
-## Segurança preservada
+- `AlphaBuildersApp`: aproximadamente **149,38 kB minificado / 48,35 kB gzip**;
+- `FloatingAlpha`: aproximadamente **840,52 kB / 222,51 kB gzip**, em chunk lazy separado.
 
-O frontend não habilita:
+O chunk 3D continua acima de 500 kB e o build mantém esse aviso visível; não foi mascarado aumentando artificialmente o limite. O carregamento adaptativo evita que esse custo entre no caminho crítico em dispositivos restritos.
 
-- Base Mainnet;
-- compra ou venda de ALPHA;
-- transferência de ativos;
-- `approve` ou `permit`;
-- swap, bridge ou staking;
-- assinatura de mensagens ou transações financeiras;
-- promessa de preço, lucro, rendimento ou valorização.
+## `/api/status` resiliente
 
-## Estrutura
+O endpoint de métricas depende da API pública do GitHub. Essa dependência externa não é tratada como fonte infalível.
 
-```text
-ALPHA-Lab/
-  contracts/
-  docs/
-  ignition/
-  scripts/
-  web/
-    app/
-      api/status/
-      api/version/
-      builders/[issue]/
-      robots.ts
-      sitemap.ts
-    components/
-      three/FloatingAlpha.tsx
-      three/PerformanceAwareAlpha.tsx
-    hooks/
-      useEvmWallet.ts
-      usePublicStatus.ts
-    lib/
-      builders.ts
-      validation.ts
-    scripts/
-    tests/
-    package.json
-    package-lock.json
-    vite.config.ts
-    wrangler.jsonc
-```
+O contrato atual retorna:
+
+- `state`: `ok`, `partial` ou `unavailable`;
+- `checkedAt`;
+- métricas como `number | null`;
+- Builders públicos quando a fonte necessária estiver disponível.
+
+Se o GitHub falhar, sofrer rate limit ou ficar indisponível, métricas ausentes ficam `null`. A interface mostra `—` e uma mensagem de disponibilidade, em vez de inventar `0`.
+
+Métricas atuais:
+
+- submissões;
+- em revisão;
+- aceitas;
+- taxa de aceite;
+- Builders únicos;
+- projetos distintos;
+- Builders recorrentes;
+- aceites por Builder.
+
+## Perfis públicos
+
+`/builders/[issue]` só publica uma prova quando a Issue está marcada como `accepted` e o conteúdo pode ser interpretado com segurança.
+
+O perfil mostra:
+
+- projeto;
+- evidência pública;
+- endereço EVM abreviado;
+- Issue pública;
+- data de submissão e aceitação;
+- critérios verificáveis;
+- histórico `Submitted → Parsed → Accepted`.
+
+A aprovação continua humana e o perfil não atribui valor financeiro à contribuição.
 
 ## CI do frontend
 
@@ -101,38 +128,62 @@ npm run build
 npm audit --omit=dev --audit-level=high
 ```
 
-`web/package-lock.json` está versionado e é obrigatório. A CI usa `npm ci` diretamente; não há geração temporária de lockfile.
+`web/package-lock.json` está versionado e é obrigatório. O build Next fixa explicitamente `turbopack.root` em `web/`, evitando ambiguidade causada pelos lockfiles do monorepositório.
 
-`.github/workflows/cloudflare-build.yml` adiciona um gate específico de portabilidade:
+`.github/workflows/cloudflare-build.yml` adiciona:
 
 ```bash
 npm ci
 npm run build:vinext
 ```
 
-Esse gate não substitui o build Next.js; os dois precisam permanecer válidos.
+Os workflows principais usam `actions/checkout@v7` e `actions/setup-node@v7`.
+
+## Browser Quality
+
+`.github/workflows/frontend-browser-quality.yml` inicia a build canônica e executa testes reais em Chromium.
+
+A suíte Playwright cobre:
+
+- presença do conteúdo crítico da home;
+- primeiro foco de teclado no skip link;
+- fluxo válido de Pull Request com carteira EVM mockada em Base Sepolia;
+- rejeição de evidência fora do GitHub.
+
+Axe é injetado no navegador e bloqueia violações WCAG 2 A/AA com impacto sério ou crítico.
+
+Lighthouse CI exige:
+
+- Performance >= 0,85;
+- Accessibility >= 0,95;
+- Best Practices >= 0,95;
+- SEO >= 0,95.
+
+Esses budgets são gates de CI; não são métricas de marketing.
 
 ## Deploy Cloudflare
 
-`.github/workflows/cloudflare-deploy.yml` publica automaticamente mudanças de `web/**` que chegam à `main`. O modo manual continua disponível com confirmação explícita.
+`.github/workflows/cloudflare-deploy.yml` publica automaticamente mudanças de `web/**` ou do próprio workflow que chegam à `main`. O modo manual continua disponível com confirmação explícita.
 
-Antes da publicação, o workflow executa todos os gates do frontend e o build vinext. Depois do deploy, valida a própria URL pública e exige:
+Antes da publicação, o workflow executa os gates do frontend e o build vinext. Depois do deploy, valida:
 
-- marcador `ALPHA`;
+- `ALPHA`;
 - `Base Sepolia`;
 - hero atual `Aprenda construindo.`;
 - ausência de Base Mainnet, compra, swap e staking;
-- `/api/version` válido;
-- `/api/status` válido;
+- `/api/version`;
+- `/api/status`;
 - Chain ID `84532`;
 - contrato oficial;
 - SHA de produção exatamente igual ao commit implantado.
 
-O hardening de produto/performance foi publicado e validado no commit `68c8060e23e1d6bcd184d8735de1cabed6732a6c`.
+Como o Cloudflare pode apresentar uma pequena janela de propagação após publicar uma nova versão, o workflow consulta `/api/version` com cache-busting e aguarda por uma janela limitada. Ele só avança quando recebe exatamente `GITHUB_SHA`; um SHA antigo ou incorreto após o timeout continua falhando o deploy.
+
+A fase de reliability/browser-quality foi publicada no commit `cd514c2b3d6ef55bad24752031a90eba495e8427`. O hardening posterior do verificador de propagação foi publicado no commit `48e183e39907d8ea7300966691eff6c7a19a28f5`.
 
 ## Smoke test
 
-`.github/workflows/frontend-smoke.yml` compila e inicia a fonte canônica em ambiente efêmero e agora também valida os novos marcadores de acessibilidade/submissão e a estrutura ampliada de `/api/status`.
+`.github/workflows/frontend-smoke.yml` compila e inicia a fonte canônica em ambiente efêmero e valida os marcadores, `/api/version` e o contrato resiliente de `/api/status`.
 
 `.github/workflows/cloudflare-production-smoke.yml` testa a implantação pública real em Cloudflare Workers, incluindo página, APIs e invariantes de rede/contrato. Esse smoke também roda em agenda periódica.
 
@@ -158,34 +209,20 @@ A URL de Pull Request é preservada como `Evidence`, enquanto o repositório bas
 
 `accepted` é reservado à revisão humana.
 
-## Histórico público e perfis
+## Segurança preservada
 
-`/api/status` consulta apenas Issues públicas e devolve:
+O frontend não habilita:
 
-- total de submissões;
-- total em revisão;
-- total aceito;
-- taxa de aceite;
-- Builders únicos;
-- projetos distintos;
-- até 12 Builders aceitos com Issue, repositório, evidência e endereço EVM abreviado.
-
-A rota `/builders/[issue]` só publica um perfil quando a Issue possui label `accepted` e a submissão pode ser analisada com segurança. O perfil mostra projeto, evidência, carteira abreviada, Issue e data pública de validação.
-
-O frontend não renderiza HTML arbitrário de Issues e só publica campos extraídos por regras restritas.
-
-## Métricas
-
-Classificação recomendada:
-
-- `ON_CHAIN`: dados verificáveis do contrato, como supply;
-- `GITHUB`: submissões, revisões, aceites, taxa de aceite, Builders únicos e projetos distintos;
-- `STATIC`: Chain ID e contrato configurado.
-
-A avaliação de produto deve priorizar submissão, conclusão, aceitação, diversidade de projetos e repetição de uso, não quantidade de tokens.
+- Base Mainnet;
+- compra ou venda de ALPHA;
+- transferência de ativos;
+- `approve` ou `permit`;
+- swap, bridge ou staking;
+- assinatura de mensagens ou transações financeiras;
+- promessa de preço, lucro, rendimento ou valorização.
 
 ## Rastreabilidade
 
 `/api/version` retorna `version`, `chainId`, `contract` e o SHA disponível no ambiente. O build/deploy injeta `NEXT_PUBLIC_GIT_SHA`.
 
-A URL Cloudflare é publicada diretamente a partir de `web/`, e o deploy só é considerado válido depois que o smoke pós-publicação confirma a correspondência exata do SHA.
+A URL Cloudflare é publicada diretamente a partir de `web/`, e o deploy só é considerado válido depois que a verificação pós-publicação confirma a correspondência exata do SHA.
