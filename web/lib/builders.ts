@@ -1,4 +1,3 @@
-import "server-only";
 import { parseSubmission } from "@/lib/validation";
 
 const REPO = "Kadys-dv/ALPHA-Lab";
