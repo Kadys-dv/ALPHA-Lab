@@ -1,0 +1,84 @@
+name: ALPHA Builders Submission Validation
+
+on:
+  issues:
+    types: [opened, edited, reopened]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  validate:
+    if: startsWith(github.event.issue.title, '[ALPHA Builders]')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate public submission
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const existing = (issue.labels || []).map(l => typeof l === 'string' ? l : l.name).filter(Boolean);
+            if (existing.includes('accepted')) {
+              core.info('Accepted submissions remain under human control. Skipping automatic relabeling.');
+              return;
+            }
+
+            const ensureLabel = async (name, color, description) => {
+              try {
+                await github.rest.issues.getLabel({ ...context.repo, name });
+              } catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({ ...context.repo, name, color, description });
+              }
+            };
+
+            const labelDefs = [
+              ['submission','1d76db','ALPHA Builders public submission'],
+              ['under-review','fbca04','Waiting for human review'],
+              ['valid','0e8a16','Technical checks passed'],
+              ['invalid','d73a4a','Technical checks failed'],
+              ['needs-review','5319e7','Requires manual inspection'],
+              ['accepted','2ea44f','Accepted after human review']
+            ];
+            for (const [name,color,description] of labelDefs) await ensureLabel(name,color,description);
+
+            const body = issue.body || '';
+            const repoMatch = body.match(/^Repository:\s*(https:\/\/github\.com\/[^\s/]+\/[^\s/]+)\s*$/im);
+            const walletMatch = body.match(/^Wallet:\s*(0x[a-fA-F0-9]{40})\s*$/im);
+            const base = ['submission'];
+
+            if (!repoMatch || !walletMatch) {
+              await github.rest.issues.setLabels({ ...context.repo, issue_number: issue.number, labels: [...base, 'invalid'] });
+              await github.rest.issues.createComment({ ...context.repo, issue_number: issue.number, body: 'Validação automática: faltou uma URL pública de repositório GitHub ou um endereço EVM público válido. Nenhuma aprovação foi realizada.' });
+              return;
+            }
+
+            const parsed = new URL(repoMatch[1]);
+            const parts = parsed.pathname.split('/').filter(Boolean);
+            if (parsed.protocol !== 'https:' || parsed.hostname !== 'github.com' || parts.length !== 2) {
+              await github.rest.issues.setLabels({ ...context.repo, issue_number: issue.number, labels: [...base, 'invalid'] });
+              return;
+            }
+
+            const [owner, repo] = parts;
+            try {
+              const repository = await github.rest.repos.get({ owner, repo });
+              if (repository.data.private) throw new Error('Repository is private');
+              try {
+                await github.rest.repos.getReadme({ owner, repo });
+              } catch (error) {
+                if (error.status === 404) {
+                  await github.rest.issues.setLabels({ ...context.repo, issue_number: issue.number, labels: [...base, 'needs-review'] });
+                  await github.rest.issues.createComment({ ...context.repo, issue_number: issue.number, body: 'Repositório público encontrado, mas nenhum README foi localizado. Revisão humana necessária.' });
+                  return;
+                }
+                throw error;
+              }
+              await github.rest.issues.setLabels({ ...context.repo, issue_number: issue.number, labels: [...base, 'valid', 'under-review'] });
+              await github.rest.issues.createComment({ ...context.repo, issue_number: issue.number, body: 'Validação técnica concluída: repositório público, README presente e endereço EVM em formato válido. A contribuição **não foi aceita automaticamente**; o próximo passo continua sendo revisão humana.' });
+            } catch (error) {
+              core.warning(error.message);
+              await github.rest.issues.setLabels({ ...context.repo, issue_number: issue.number, labels: [...base, 'invalid'] });
+              await github.rest.issues.createComment({ ...context.repo, issue_number: issue.number, body: 'Não foi possível validar o repositório como público e acessível. Verifique a URL e tente novamente.' });
+            }
