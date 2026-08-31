@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "./hardening.css";
+import "./accessibility.css";
 
 const productionUrl = "https://alpha-builders-web.cskadys.workers.dev";
 
