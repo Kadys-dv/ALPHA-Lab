@@ -1,117 +1,113 @@
 # ALPHA Lab
 
-Projeto independente para desenvolver e validar o token utilitário ERC-20 **Alpha (ALPHA)** sem gastar dinheiro real durante o laboratório.
+Laboratório público para desenvolver e validar o token utilitário ERC-20 **Alpha (ALPHA)** com Hardhat 3, Solidity e Base Sepolia.
 
-O objetivo comercial futuro não é prometer valorização do token. A estratégia é usar ALPHA como acesso e recompensa dentro de um produto digital; a receita deverá vir de utilidades reais, como serviços e assinaturas, inicialmente cobrados em reais.
+O contrato já está publicado e validado em testnet. ALPHA não está à venda, não promete rendimento e não deve ser tratada como investimento. O objetivo atual é provar utilidade real antes de considerar qualquer operação comercial.
 
-## Estado da v0.1
+## Estado atual
 
-- ERC-20 de supply fixo: **100.000.000 ALPHA**
-- 18 decimais
-- supply inteiro entregue ao deployer
-- sem mint posterior
-- sem owner/admin
-- sem taxas
-- sem blacklist
-- sem pause
-- sem proxy/upgrade
-- sem venda
-- alvo de rede pública: **Base Sepolia (testnet)**
-- contrato público validado: `0xff15343aCcc4B77479EBE3C4cae32d99d4c60f48`
+| Item | Estado |
+|---|---|
+| Contrato ERC-20 | Concluído |
+| Testes Solidity | 7 aprovados |
+| Invariantes de segurança/configuração | 18 aprovadas |
+| Deploy local | Validado |
+| Deploy Base Sepolia | Validado |
+| Utilidade do produto | Em definição |
+| Venda, liquidez e mainnet | Bloqueadas |
 
-O contrato usa a implementação ERC-20 do OpenZeppelin Contracts.
+## Deploy público
 
-## Requisitos
+- Rede: **Base Sepolia**
+- Chain ID: `84532`
+- Contrato: [`0xff15343aCcc4B77479EBE3C4cae32d99d4c60f48`](https://sepolia.basescan.org/address/0xff15343aCcc4B77479EBE3C4cae32d99d4c60f48)
+- Deployer: [`0xdb854d4D76a213740621e0dFa48de9BF7836c273`](https://sepolia.basescan.org/address/0xdb854d4D76a213740621e0dFa48de9BF7836c273)
+- Data da validação: `2026-08-31`
 
-- Node.js 22.13.0 ou superior
-- npm
-- VS Code opcional
+Verificações on-chain concluídas:
 
-## Instalação
+- bytecode publicado;
+- `name = Alpha`;
+- `symbol = ALPHA`;
+- `decimals = 18`;
+- supply fixo de **100.000.000 ALPHA**;
+- 100% do supply inicial entregue ao deployer.
+
+## Propriedades do contrato
+
+- implementação ERC-20 do OpenZeppelin Contracts;
+- supply fixo e mint único no construtor;
+- sem mint posterior;
+- sem owner/admin;
+- sem taxa de transferência;
+- sem blacklist ou pause;
+- sem proxy ou upgrade;
+- sem função de venda, staking ou rendimento.
+
+## Desenvolvimento local
+
+Requisitos:
+
+- Node.js `22.13.0` ou superior;
+- npm;
+- Git.
+
+Instale e valide:
 
 ```bash
-npm install
+npm ci
+npm run validate
 ```
 
-## Compilar
+O comando `validate` executa guardas do código-fonte, compilação, testes Solidity e deploy local efêmero.
+
+Comandos individuais:
 
 ```bash
+npm run guard
 npm run build
-```
-
-## Testar
-
-```bash
 npm test
-```
-
-Os testes conferem nome, símbolo, 18 decimais, supply total, saldo inicial do deployer e transferência sem alteração de supply.
-
-## Deploy local sem dinheiro
-
-```bash
 npm run deploy:local
 ```
 
-Ou, para manter uma blockchain local rodando:
+## Base Sepolia
 
-Terminal 1:
-
-```bash
-npm run node
-```
-
-Terminal 2:
+O fluxo de testnet usa RPC público, Hardhat Keystore e ETH de teste sem valor real:
 
 ```bash
-npx hardhat ignition deploy ignition/modules/AlphaToken.ts --network localhost
-```
-
-## Base Sepolia — R$ 0
-
-A configuração já aponta para o RPC público da Base Sepolia e usa chain ID `84532`.
-
-Crie uma carteira exclusiva para testes. Nunca use a seed phrase ou chave de uma carteira que possua dinheiro real.
-
-Salve a chave de teste no keystore do Hardhat:
-
-```bash
+npm run preflight:base-sepolia -- 0xSEU_ENDERECO
 npx hardhat keystore set BASE_SEPOLIA_PRIVATE_KEY
-```
-
-Depois de obter ETH **de testnet** gratuitamente em um faucet da Base Sepolia:
-
-```bash
 npm run deploy:base-sepolia
+npm run verify:base-sepolia -- 0xCONTRATO 0xDEPLOYER
 ```
 
-O ETH da Base Sepolia não possui valor real. O deploy nessa rede serve apenas para aprendizado.
+Nunca envie seed phrase ou chave privada pelo chat, por issue, commit, `.env` versionado ou GitHub Actions.
 
-Contrato publicado e validado on-chain:
+## Estratégia de produto
 
-```text
-https://sepolia.basescan.org/address/0xff15343aCcc4B77479EBE3C4cae32d99d4c60f48
-```
+ALPHA deverá funcionar como acesso, recompensa ou desconto dentro de um produto digital. A receita inicial deverá vir de utilidades reais, como serviços, assinaturas, parcerias ou licenciamento, e não da expectativa de valorização do token.
 
-## Estrutura
+Operação gratuita é uma meta apenas para o laboratório e a validação inicial. Uma futura operação com usuários poderá exigir gastos com segurança, infraestrutura, contabilidade, suporte e revisão jurídica.
 
-```text
-ALPHA-Lab/
-├── contracts/
-│   ├── AlphaToken.sol
-│   └── AlphaToken.t.sol
-├── ignition/modules/
-│   └── AlphaToken.ts
-├── docs/
-│   ├── DESIGN.md
-│   ├── MONETIZATION.md
-│   ├── ROADMAP.md
-│   └── SECURITY.md
-├── hardhat.config.ts
-├── package.json
-└── README.md
-```
+## Documentação
 
-## Importante
+- [Desenho do token](docs/DESIGN.md)
+- [Deploy e evidências da Base Sepolia](docs/BASE-SEPOLIA.md)
+- [Estratégia de monetização](docs/MONETIZATION.md)
+- [Roadmap](docs/ROADMAP.md)
+- [Política de segurança](docs/SECURITY.md)
 
-ALPHA v0.1 é um laboratório. Não foi projetado como investimento, não promete rendimento e não está sendo vendido. Mainnet e dinheiro real estão explicitamente fora do escopo atual. O plano comercial e seus gates estão em `docs/MONETIZATION.md`.
+## Escopo bloqueado
+
+Enquanto os gates de produto, segurança e conformidade não forem cumpridos, permanecem fora do escopo:
+
+- Base Mainnet;
+- venda pública de ALPHA;
+- pool de liquidez;
+- promessa de preço, lucro ou valorização;
+- staking ou rendimento;
+- custódia de ativos de terceiros.
+
+## Licença e responsabilidade
+
+Este repositório é um laboratório técnico e não constitui oferta, recomendação de investimento, consultoria jurídica ou garantia de retorno.

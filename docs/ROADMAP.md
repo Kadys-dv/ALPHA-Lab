@@ -1,69 +1,69 @@
 # Roadmap de validação
 
-## Fase 1 — base do projeto
+## Fase 1 — base do projeto: concluída
 
-- ERC-20 ALPHA de supply fixo
-- testes Solidity
-- Hardhat 3
-- OpenZeppelin Contracts
-- módulo de deploy Hardhat Ignition
-- configuração Base Sepolia
-- política básica de segurança
+- [x] ERC-20 ALPHA de supply fixo
+- [x] testes Solidity
+- [x] Hardhat 3 e OpenZeppelin Contracts
+- [x] módulo de deploy Hardhat Ignition
+- [x] configuração Base Sepolia
+- [x] política básica de segurança
 
-## Fase 2 — execução local
+## Fase 2 — execução local: concluída
 
-- instalar dependências
-- compilar
-- executar testes
-- subir nó local
-- fazer deploy local
-- transferir ALPHA entre contas locais
+- [x] instalação reproduzível com `npm ci`
+- [x] compilação Solidity 0.8.34
+- [x] 18 invariantes de código/configuração
+- [x] 7 testes Solidity
+- [x] deploy local
 
-## Fase 3 — Base Sepolia
+## Fase 3 — Base Sepolia: concluída
 
-- criar carteira exclusivamente de testes
-- obter ETH de testnet em faucet
-- guardar a chave no Hardhat Keystore
-- fazer deploy na Base Sepolia
-- registrar endereço e hash da transação
-- transferir ALPHA para outra carteira de teste
-- visualizar as operações no explorer
+- [x] carteira exclusiva de testes
+- [x] ETH gratuito de testnet
+- [x] chave armazenada no Hardhat Keystore
+- [x] deploy público
+- [x] bytecode e metadados validados on-chain
+- [x] supply inicial confirmado no deployer
+- [x] endereço registrado na documentação
 
-## Fase 4 — laboratório de recompensas
+Contrato validado: `0xff15343aCcc4B77479EBE3C4cae32d99d4c60f48`.
 
-- desenhar regras de recompensa fora do contrato principal
-- criar um distribuidor separado, limitado e testável
-- adicionar testes antiabuso
-- manter o supply de ALPHA imutável
+## Fase 4 — descoberta de produto: próxima
 
-## Fase 5 — validação de produto sem custo
+- [ ] escolher um público específico
+- [ ] definir um problema que possa ser validado
+- [ ] entrevistar 20 usuários potenciais
+- [ ] escolher uma utilidade mensurável para ALPHA
+- [ ] documentar regras de distribuição e antiabuso
+- [ ] manter o contrato principal inalterado
 
-- escolher um problema e um público específicos
-- publicar uma landing page gratuita com lista de espera
-- entrevistar pelo menos 20 usuários potenciais
-- obter 10 usuários de teste ativos
-- validar uma utilidade de ALPHA em Base Sepolia
-- medir ativação, retenção e uso da utilidade
+## Fase 5 — piloto gratuito
 
-## Fase 6 — primeira receita sem venda do token
+- [ ] publicar landing page e lista de espera
+- [ ] construir a menor utilidade fora do contrato principal
+- [ ] obter 10 usuários ativos
+- [ ] validar uso repetido por pelo menos 5 usuários
+- [ ] medir ativação, retenção e custo operacional
 
-- oferecer um serviço digital ou assinatura em reais
-- emitir nota e registrar receitas conforme a estrutura aplicável
-- usar ALPHA apenas como acesso, recompensa ou desconto
-- documentar termos, privacidade, riscos e suporte
-- reinvestir somente receita já recebida, sem aporte obrigatório do fundador
+## Fase 6 — primeira receita
+
+- [ ] oferecer serviço ou assinatura em reais
+- [ ] obter 3 clientes pagantes sem vender ALPHA
+- [ ] registrar receitas e custos
+- [ ] documentar termos, privacidade, riscos e suporte
+- [ ] reinvestir somente receita já recebida
 
 ## Gate anterior à mainnet
 
-Mainnet continua bloqueada até existir produto funcional, usuários reais, receita comprovada sem venda especulativa, revisão jurídica/tributária e orçamento para segurança e operação.
+Mainnet continuará bloqueada até existirem produto funcional, utilidade comprovada, usuários reais, receita independente da especulação, revisão jurídica/tributária e orçamento sustentável para segurança e operação.
 
 ## Fora do escopo atual
 
-- mainnet
-- venda de token
-- pool de liquidez
-- promessa de valorização
-- staking/rendimento
-- integração com outro projeto
-- promessa de lucro, preço mínimo ou recompra
-- marketing baseado em escassez ou valorização futura
+- mainnet;
+- venda pública do token;
+- pool de liquidez;
+- staking, dividendos ou rendimento;
+- promessa de lucro, preço mínimo ou recompra;
+- marketing baseado em escassez ou valorização futura;
+- integração com outro projeto.

@@ -1,4 +1,4 @@
-# Segurança do ALPHA Lab
+# Segurança e operação do ALPHA Lab
 
 Este projeto é educacional e não substitui auditoria profissional.
 
@@ -14,6 +14,27 @@ Este projeto é educacional e não substitui auditoria profissional.
 8. Não anunciar rendimento, valorização, recompra ou retorno financeiro.
 9. Não custodiar dinheiro ou tokens de usuários no laboratório.
 10. Não criar liquidez, venda pública ou mainnet sem revisão específica.
+
+## Segredos locais
+
+- o Hardhat Keystore é local e não deve ser enviado ao repositório;
+- a senha do keystore não é a senha do MetaMask;
+- screenshots não devem incluir chave, seed phrase ou segredo revelado;
+- o endereço público e o endereço do contrato podem ser documentados;
+- em caso de exposição da chave, interromper o uso da carteira e criar outra exclusivamente para testnet.
+
+## Gates para código novo
+
+Qualquer distribuidor, sistema de recompensas ou aplicação deverá incluir:
+
+- limites explícitos;
+- proteção contra repetição e abuso;
+- testes de autorização;
+- eventos suficientes para auditoria;
+- pausa operacional fora do token principal, quando necessária;
+- revisão de ameaças antes do piloto.
+
+O contrato ERC-20 principal não deverá receber funções administrativas apenas para facilitar experimentos.
 
 ## Se um dia houver mainnet
 

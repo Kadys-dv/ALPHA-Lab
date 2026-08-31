@@ -38,3 +38,14 @@ Somente ambiente local e Base Sepolia. Mainnet está fora do escopo da v0.1.
 Antes de qualquer mainnet, ALPHA deverá provar pelo menos uma utilidade que funcione sem expectativa de valorização, como acesso a recurso digital, desconto, licença, participação em comunidade ou recompensa por contribuição verificável.
 
 O token não representa participação societária, dívida, rendimento, dividendos ou direito sobre receita. Qualquer mudança nessa definição exige nova análise técnica e jurídica.
+
+## Decisões que permanecem abertas
+
+- público inicial do produto;
+- problema específico que o produto resolverá;
+- ação que gera recompensa;
+- utilidade consumível ou recorrente de ALPHA;
+- limites de distribuição e mecanismos antiabuso;
+- experiência para usuários sem carteira cripto.
+
+Essas decisões devem ser validadas fora do contrato principal. O ERC-20 publicado permanece simples e imutável durante a fase de descoberta.

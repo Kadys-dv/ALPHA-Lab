@@ -14,6 +14,12 @@ Não existe garantia de lucro nem operação permanentemente gratuita. A meta in
 4. Conceder ALPHA de testnet por contribuições verificáveis.
 5. Usar ALPHA para liberar recursos, descontos ou participação, sem prometer preço futuro.
 
+## Hipótese inicial de negócio
+
+O primeiro experimento não venderá ALPHA. Será oferecido um serviço digital simples, cobrado em reais, para um público ainda a definir. Usuários poderão receber ALPHA na Base Sepolia por ações verificáveis e usar o token para acessar uma vantagem concreta dentro do piloto.
+
+O experimento somente será considerado validado se houver uso repetido da vantagem e disposição real de pagar pelo serviço, independentemente do preço do token.
+
 ## Fontes de receita em ordem
 
 ### 1. Serviços digitais
@@ -48,6 +54,16 @@ Licenciar o sistema de recompensas ou a infraestrutura para outras comunidades. 
 - 5 usuários usando a utilidade do token mais de uma vez
 - 3 clientes pagantes pelo serviço ou assinatura
 - retenção mensal e custo operacional registrados
+
+## Experimentos em ordem
+
+1. Escolher um único público e problema.
+2. Criar uma página de apresentação com lista de espera.
+3. Realizar 20 entrevistas sem oferecer investimento.
+4. Construir a menor utilidade testável em Base Sepolia.
+5. Executar um piloto com 10 usuários.
+6. Tentar obter 3 clientes pagantes pelo serviço em reais.
+7. Decidir entre continuar, ajustar ou encerrar com base nas métricas.
 
 ## Gates de segurança e negócio
 
