@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "./hardening.css";
 import "./accessibility.css";
+import "./template-accessibility.css";
 
 const productionUrl = "https://alpha-builders-web.cskadys.workers.dev";
 
