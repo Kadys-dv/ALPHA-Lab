@@ -1,6 +1,11 @@
 name: Cloudflare Deploy
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'web/**'
+      - '.github/workflows/cloudflare-deploy.yml'
   workflow_dispatch:
     inputs:
       confirm:
@@ -17,7 +22,7 @@ concurrency:
 
 jobs:
   deploy:
-    if: ${{ inputs.confirm == 'deploy-alpha-builders' }}
+    if: ${{ github.event_name == 'push' || inputs.confirm == 'deploy-alpha-builders' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -68,6 +73,7 @@ jobs:
           root="$(curl --fail --silent --show-error --retry 8 --retry-delay 2 --retry-all-errors "$PRODUCTION_URL/")"
           printf '%s' "$root" | grep -Fq 'ALPHA'
           printf '%s' "$root" | grep -Fq 'Base Sepolia'
+          printf '%s' "$root" | grep -Fq 'Aprenda construindo.'
           ! printf '%s' "$root" | grep -Fq 'Base Mainnet'
           ! printf '%s' "$root" | grep -Fq 'Comprar ALPHA'
           ! printf '%s' "$root" | grep -Fq 'Swap ALPHA'
