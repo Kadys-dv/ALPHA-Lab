@@ -39,8 +39,11 @@ describe("submission validation", () => {
       evidenceUrl: "https://github.com/Kadys-dv/ALPHA-Lab/pull/27",
       wallet: "0x1111111111111111111111111111111111111111",
     });
+    const issueUrl = new URL(url);
     expect(url).toContain("issues/new?");
-    expect(decodeURIComponent(url)).toContain("Evidence: https://github.com/Kadys-dv/ALPHA-Lab/pull/27");
+    expect(issueUrl.searchParams.get("body")).toContain(
+      "Evidence: https://github.com/Kadys-dv/ALPHA-Lab/pull/27",
+    );
   });
 
   it("parses current submission format", () => {
