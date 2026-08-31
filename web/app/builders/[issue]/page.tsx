@@ -44,6 +44,10 @@ export default async function BuilderProfile({ params }: { params: Params }) {
     dateStyle: "long",
     timeZone: "UTC",
   }).format(new Date(builder.updatedAt));
+  const submittedDate = new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "long",
+    timeZone: "UTC",
+  }).format(new Date(builder.createdAt));
 
   return (
     <main className="builder-profile-page" id="main-content">
@@ -93,6 +97,37 @@ export default async function BuilderProfile({ params }: { params: Params }) {
             <a href={builder.issueUrl} target="_blank" rel="noreferrer">
               Issue #{builder.issue} <Github size={16} />
             </a>
+          </article>
+        </section>
+
+        <section className="builder-validation" aria-labelledby="validation-title">
+          <div>
+            <small>CRITÉRIOS VERIFICADOS</small>
+            <h2 id="validation-title">O que esta prova realmente confirma.</h2>
+          </div>
+          <ul>
+            <li><Check size={16} /> Evidência hospedada publicamente no github.com</li>
+            <li><Check size={16} /> URL normalizada para repositório ou Pull Request</li>
+            <li><Check size={16} /> Endereço EVM público com formato válido</li>
+            <li><Check size={16} /> Issue marcada como aceita após revisão humana</li>
+          </ul>
+        </section>
+
+        <section className="builder-lifecycle" aria-label="Histórico verificável da validação">
+          <article>
+            <small>01 / SUBMITTED</small>
+            <strong>{submittedDate}</strong>
+            <span>A evidência entrou no pipeline por uma Issue pública.</span>
+          </article>
+          <article>
+            <small>02 / PARSED</small>
+            <strong>Evidência válida</strong>
+            <span>Projeto, link de evidência e identidade testnet puderam ser extraídos.</span>
+          </article>
+          <article>
+            <small>03 / ACCEPTED</small>
+            <strong>{acceptedDate}</strong>
+            <span>A aprovação final permanece uma decisão humana e pública.</span>
           </article>
         </section>
 
