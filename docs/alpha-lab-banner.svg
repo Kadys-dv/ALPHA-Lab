@@ -1,0 +1,35 @@
+<svg width="1200" height="360" viewBox="0 0 1200 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="360" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#111827"/>
+      <stop offset="0.55" stop-color="#172554"/>
+      <stop offset="1" stop-color="#0F172A"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="80" y1="70" x2="980" y2="280" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FBBF24"/>
+      <stop offset="1" stop-color="#38BDF8"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="18" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="1200" height="360" rx="24" fill="url(#bg)"/>
+  <circle cx="1040" cy="42" r="150" fill="#2563EB" opacity="0.16"/>
+  <circle cx="1040" cy="42" r="92" stroke="#38BDF8" stroke-opacity="0.3"/>
+  <path d="M0 302C172 246 278 332 462 282C645 232 738 118 922 168C1050 203 1116 164 1200 126" stroke="url(#accent)" stroke-width="2" opacity="0.65"/>
+  <path d="M0 324C172 268 278 354 462 304C645 254 738 140 922 190C1050 225 1116 186 1200 148" stroke="#FBBF24" stroke-opacity="0.18" stroke-width="1"/>
+  <g filter="url(#glow)">
+    <circle cx="930" cy="196" r="7" fill="#FBBF24"/>
+    <circle cx="930" cy="196" r="28" stroke="#FBBF24" stroke-opacity="0.35"/>
+  </g>
+  <g stroke="#7DD3FC" stroke-opacity="0.32" stroke-width="1">
+    <path d="M860 84L1002 164L1098 112L930 196L1002 264"/>
+    <path d="M860 84L930 196L1098 112"/>
+    <path d="M930 196L1002 264L1110 232"/>
+  </g>
+  <text x="72" y="92" fill="#FBBF24" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="16" letter-spacing="4">PUBLIC LAB / 2026</text>
+  <text x="68" y="166" fill="white" font-family="Arial, Helvetica, sans-serif" font-size="68" font-weight="700">ALPHA LAB</text>
+  <text x="72" y="210" fill="#BAE6FD" font-family="Arial, Helvetica, sans-serif" font-size="22">Security, blockchain and product experimentation</text>
+  <text x="72" y="274" fill="#CBD5E1" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="15">FIXED SUPPLY  /  BASE SEPOLIA  /  VERIFIED FLOWS</text>
+</svg>

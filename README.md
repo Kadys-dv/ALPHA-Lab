@@ -1,44 +1,90 @@
 # ALPHA Lab
 
-Laboratório público para desenvolver e validar o token utilitário ERC-20 **Alpha (ALPHA)** com Hardhat 3, Solidity e Base Sepolia.
+[![Solidity Validation](https://github.com/Kadys-dv/ALPHA-Lab/actions/workflows/solidity-validation.yml/badge.svg)](https://github.com/Kadys-dv/ALPHA-Lab/actions/workflows/solidity-validation.yml)
+[![Frontend CI](https://github.com/Kadys-dv/ALPHA-Lab/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/Kadys-dv/ALPHA-Lab/actions/workflows/frontend-ci.yml)
+[![Live Demo](https://img.shields.io/badge/live_demo-ALPHA_Builders-FBBF24?style=flat&logo=cloudflare&logoColor=111827)](https://alpha-builders-web.cskadys.workers.dev)
+[![Base Sepolia](https://img.shields.io/badge/network-Base_Sepolia-38BDF8?style=flat)](https://sepolia.basescan.org/address/0xff15343aCcc4B77479EBE3C4cae32d99d4c60f48)
 
-O contrato já está publicado e validado em testnet. ALPHA não está à venda, não promete rendimento e não deve ser tratada como investimento. O objetivo atual é validar utilidade real por meio do **ALPHA Builders**, experiência pública voltada à revisão e apresentação de projetos de desenvolvedores.
+<p align="center">
+  <img src="docs/alpha-lab-banner.svg" alt="ALPHA Lab: security, blockchain and product experimentation" width="100%" />
+</p>
 
-## Estado atual
+Projeto de segurança e experimentação em blockchain para desenvolver e validar um token utilitário ERC-20 em uma experiência de produto real.
 
-| Item | Estado |
+O ALPHA Lab entrega um token **ALPHA** de supply fixo e o **ALPHA Builders**, uma experiência pública para revisão e apresentação de projetos. A implementação combina Solidity, frontend web, automação e validações públicas, sem depender de venda ou especulação do token.
+
+## Visão rápida
+
+| | |
 |---|---|
-| Contrato ERC-20 | Concluído |
-| Testes Solidity | 7 aprovados |
-| Invariantes de segurança/configuração | 18 aprovadas |
-| Deploy Base Sepolia | Validado |
-| ALPHA Builders | Publicado no Cloudflare Workers |
-| Fonte canônica do frontend | Versionada em `web/` |
-| Utilidade inicial | Revisão estruturada de README |
-| Evidência aceita | Repositório ou Pull Request público |
-| Perfis públicos de Builders | `/builders/[issue]` |
-| Submissão de contribuições | GitHub Issue real |
-| Validação técnica de submissões | GitHub Actions |
-| Aprovação final | Revisão humana |
-| Build Cloudflare Workers | Validado via vinext |
-| Browser QA | Playwright + Axe |
-| Quality budgets | Lighthouse CI |
-| Deploy de produção | Automático em mudanças de `web/**` ou do workflow de deploy na `main` |
-| Venda, liquidez e mainnet | Bloqueadas |
+| **Demo** | [ALPHA Builders](https://alpha-builders-web.cskadys.workers.dev) |
+| **Contrato** | [ALPHA na BaseScan](https://sepolia.basescan.org/address/0xff15343aCcc4B77479EBE3C4cae32d99d4c60f48) |
+| **Foco** | Segurança por restrição, blockchain e experimentação de produto |
+| **Stack** | Solidity, Hardhat 3, OpenZeppelin, Next.js, React, TypeScript, Base Sepolia e Cloudflare Workers |
+| **Status** | Infraestrutura e experiência pública publicadas; validação de utilidade em andamento |
 
-## ALPHA Builders
+> Uma hipótese de produto, um contrato limitado e evidências públicas para cada etapa.
 
-Experiência pública canônica: https://alpha-builders-web.cskadys.workers.dev
+## Entregas verificáveis
 
-A pasta `web/` contém a fonte canônica e reproduzível do ALPHA Builders. A experiência atual segue a direção **Interactive Storytelling + Neo-Brutalismo Tátil**, com hero “Aprenda construindo. Prove contribuindo.”, Framer Motion, núcleo 3D com React Three Fiber/Three.js, carteira EVM, Base Sepolia, desafio de README, prova técnica, métricas públicas de produto e histórico de Builders aceitos.
+| Resultado | Evidência |
+|---|---|
+| Token ERC-20 com supply fixo | `100.000.000 ALPHA`, mint único no construtor |
+| Segurança do contrato | 18 invariantes de código/configuração e 7 testes Solidity |
+| Deploy público | Base Sepolia, Chain ID `84532`, metadados e supply conferidos on-chain |
+| Produto funcional | ALPHA Builders publicado no Cloudflare Workers |
+| Fluxo de contribuição | Issues públicas, validação automática e aprovação humana |
+| Qualidade frontend | lint, TypeScript, Vitest, Playwright, Axe e Lighthouse CI |
+| Operação rastreável | endpoints de status/versão, SHA de commit e smoke de produção |
 
-O núcleo 3D é carregado sob demanda e possui fallback adaptativo para `prefers-reduced-motion`, economia de dados, pouca memória, viewport pequena ou ausência de WebGL. A cena lazy não depende mais dos helpers de Drei em runtime e permanece isolada do bundle principal.
+## Como funciona
 
-O host anterior em `chatgpt.site` é apenas legado e não é mais a URL canônica do projeto.
+```mermaid
+flowchart LR
+    A[Projeto público] --> B[Issue de submissão]
+    B --> C[Validação automática]
+    C --> D[Revisão humana]
+    D --> E[Perfil público do Builder]
+    E --> F[Métricas de produto]
+```
 
-O fluxo de carteira permanece deliberadamente sem operações financeiras: não há compra, transferência, `approve`, `permit`, swap, bridge, staking, assinatura de transação financeira ou integração com Base Mainnet.
+O contrato registra a camada de token. A revisão, a evidência pública, os perfis e as métricas ficam no frontend e na automação para manter o contrato simples e o experimento observável.
 
-## Frontend local
+## Segurança e limites
+
+- supply fixo e mint único no construtor;
+- sem owner/admin, mint posterior, taxa, blacklist, pause, proxy ou upgrade;
+- sem compra, transferência financeira, `approve`, swap, bridge, staking ou integração com Base Mainnet;
+- aprovação de contribuições sempre depende de revisão humana;
+- chaves privadas nunca são versionadas ou usadas no frontend.
+
+## O que foi validado
+
+- bytecode publicado na Base Sepolia;
+- `name = Alpha`, `symbol = ALPHA` e `decimals = 18` conferidos on-chain;
+- supply inicial confirmado no deployer;
+- build do frontend e bundle Cloudflare validados;
+- testes de acessibilidade, navegador, SEO e performance configurados na CI;
+- produção verifica o SHA implantado, a rede, o contrato e a ausência de CTAs financeiros proibidos.
+
+## O que ainda falta
+
+- entrevistar 20 usuários potenciais;
+- medir submissões, aceitação, repetição de uso e custo operacional;
+- validar a primeira utilidade fora do contrato;
+- testar receita independente da especulação do token;
+- cumprir os gates de produto, segurança, conformidade e operação antes de considerar mainnet.
+
+## Executar localmente
+
+Contrato:
+
+```bash
+npm ci
+npm run validate
+```
+
+Frontend:
 
 ```bash
 cd web
@@ -50,158 +96,24 @@ npm run build
 npm run dev
 ```
 
-`web/package-lock.json` está versionado. A CI exige instalação reproduzível com `npm ci`; não há bootstrap temporário de lockfile.
-
-Para validar também o bundle do Cloudflare Workers:
+Para validar o bundle Cloudflare:
 
 ```bash
 npm run build:vinext
 ```
 
-A integração com vinext é adicional e não substitui os comandos Next.js canônicos.
-
-## Qualidade de navegador
-
-Além de lint, TypeScript, Vitest e build, o projeto possui `.github/workflows/frontend-browser-quality.yml`.
-
-Esse gate inicia a aplicação canônica e executa:
-
-- Playwright em Chromium;
-- navegação por teclado e skip link;
-- submissão válida por Pull Request com carteira EVM mockada;
-- rejeição de evidência fora do `github.com`;
-- Axe com WCAG 2 A/AA, bloqueando violações sérias ou críticas;
-- Lighthouse CI com budgets mínimos de 85% para performance e 95% para acessibilidade, best practices e SEO.
-
-## Pipeline de contribuições
-
-Submissões do ALPHA Builders são Issues públicas. O frontend aceita como evidência a URL pública de um repositório ou de um Pull Request do GitHub e normaliza a evidência para o repositório correspondente. A automação:
-
-1. reconhece Issues com título `[ALPHA Builders]`;
-2. valida URL de repositório GitHub;
-3. confirma que o repositório existe e é público;
-4. verifica se há README;
-5. valida o formato do endereço EVM público;
-6. aplica estados técnicos como `valid`, `invalid`, `needs-review` e `under-review`;
-7. nunca aplica `accepted` automaticamente.
-
-A aprovação `accepted` permanece uma decisão humana. Builders aceitos ganham um perfil público sanitizado em `/builders/[issue]`, com projeto, evidência, carteira abreviada, Issue, critérios verificáveis e histórico de submissão → análise → aceitação.
-
-## Métricas de produto e disponibilidade
-
-`/api/status` deriva dados exclusivamente de Issues públicas e expõe:
-
-- submissões;
-- itens em revisão;
-- contribuições aceitas;
-- taxa de aceite;
-- Builders únicos;
-- projetos distintos;
-- Builders recorrentes;
-- aceites por Builder;
-- até 12 Builders aceitos com links para evidência e perfil público.
-
-O endpoint diferencia `ok`, `partial` e `unavailable`. Se a API pública do GitHub estiver indisponível ou limitada, valores ausentes ficam `null` e a interface mostra `—`; falha externa nunca é convertida em um zero falso. `checkedAt` registra quando a fonte pública foi consultada.
-
-## Performance
-
-O build Cloudflare da fase atual manteve o bundle principal `AlphaBuildersApp` em aproximadamente **149,38 kB minificado / 48,35 kB gzip**. O 3D permanece em chunk lazy separado, aproximadamente **840,52 kB / 222,51 kB gzip**, e só é habilitado em dispositivos capazes.
-
-A configuração do Next fixa explicitamente o `turbopack.root` em `web/`, removendo a ambiguidade de workspace que antes aparecia durante o build.
-
-## Rastreabilidade e produção
-
-O frontend expõe `/api/version`, com versão, Chain ID, contrato e SHA de commit. O deploy Cloudflare injeta `NEXT_PUBLIC_GIT_SHA` e valida depois da publicação que o SHA servido em produção é exatamente o commit implantado.
-
-`.github/workflows/cloudflare-deploy.yml` publica automaticamente quando `web/**` ou o próprio workflow de deploy muda na `main` e mantém também um disparo manual protegido. Antes do deploy ele executa instalação reproduzível, lint, TypeScript strict, testes, build Next.js, audit e build vinext.
-
-Após a publicação, a verificação usa cache-busting e aguarda a propagação do `/api/version` por uma janela limitada, mas continua exigindo correspondência exata com `GITHUB_SHA`. Um SHA diferente após o timeout continua bloqueando o deploy. Também valida a página pública, Base Sepolia, `/api/status`, Chain ID, contrato e ausência de CTAs financeiros proibidos.
-
-O frontend também publica `robots.txt`, `sitemap.xml`, metadata canônica/Open Graph e um skip link para navegação por teclado. `.github/workflows/cloudflare-production-smoke.yml` mantém um smoke real da URL pública.
-
-## Deploy público do contrato
-
-- Rede: **Base Sepolia**
-- Chain ID: `84532`
-- Contrato: [`0xff15343aCcc4B77479EBE3C4cae32d99d4c60f48`](https://sepolia.basescan.org/address/0xff15343aCcc4B77479EBE3C4cae32d99d4c60f48)
-- Deployer: [`0xdb854d4D76a213740621e0dFa48de9BF7836c273`](https://sepolia.basescan.org/address/0xdb854d4D76a213740621e0dFa48de9BF7836c273)
-- Data da validação: `2026-08-31`
-
-Verificações on-chain concluídas:
-
-- bytecode publicado;
-- `name = Alpha`;
-- `symbol = ALPHA`;
-- `decimals = 18`;
-- supply fixo de **100.000.000 ALPHA**;
-- 100% do supply inicial entregue ao deployer.
-
-## Propriedades do contrato
-
-- implementação ERC-20 do OpenZeppelin Contracts;
-- supply fixo e mint único no construtor;
-- sem mint posterior;
-- sem owner/admin;
-- sem taxa de transferência;
-- sem blacklist ou pause;
-- sem proxy ou upgrade;
-- sem função de venda, staking ou rendimento.
-
-## Desenvolvimento local do contrato
-
-```bash
-npm ci
-npm run validate
-```
-
-Comandos individuais:
-
-```bash
-npm run guard
-npm run build
-npm test
-npm run deploy:local
-```
-
-## Base Sepolia
-
-```bash
-npm run preflight:base-sepolia -- 0xSEU_ENDERECO
-npx hardhat keystore set BASE_SEPOLIA_PRIVATE_KEY
-npm run deploy:base-sepolia
-npm run verify:base-sepolia -- 0xCONTRATO 0xDEPLOYER
-```
-
-Nunca envie seed phrase ou chave privada pelo chat, por issue, commit, `.env` versionado ou GitHub Actions.
-
-## Estratégia de produto
-
-O ALPHA Builders testa utilidade sem depender de venda ou valorização do token. A primeira utilidade escolhida é a revisão estruturada de README, com evidências públicas e submissões rastreáveis por GitHub.
-
-As métricas prioritárias são de produto: submissão, revisão, aceitação, diversidade de projetos e repetição de uso. Métricas do token não substituem validação de utilidade.
-
 ## Documentação
 
 - [Desenho do token](docs/DESIGN.md)
 - [Deploy e evidências da Base Sepolia](docs/BASE-SEPOLIA.md)
-- [Estratégia de monetização](docs/MONETIZATION.md)
-- [Hipótese de produto ALPHA Builders](docs/PRODUCT.md)
 - [Frontend e pipeline](docs/FRONTEND.md)
 - [Cloudflare Workers](docs/CLOUDFLARE.md)
 - [Produção](docs/PRODUCTION.md)
-- [Roteiro de descoberta](docs/DISCOVERY.md)
-- [Roadmap](docs/ROADMAP.md)
+- [Métricas](docs/METRICS.md)
+- [Hipótese de produto ALPHA Builders](docs/PRODUCT.md)
+- [Roadmap de validação](docs/ROADMAP.md)
 - [Política de segurança](docs/SECURITY.md)
 
-## Escopo bloqueado
+## Nota de responsabilidade
 
-- Base Mainnet;
-- venda pública de ALPHA;
-- pool de liquidez;
-- promessa de preço, lucro ou valorização;
-- staking ou rendimento;
-- custódia de ativos de terceiros.
-
-## Licença e responsabilidade
-
-Este repositório é um laboratório técnico e não constitui oferta, recomendação de investimento, consultoria jurídica ou garantia de retorno.
+Este repositório é um laboratório técnico. ALPHA não está à venda e não constitui oferta, recomendação de investimento, consultoria jurídica ou garantia de retorno.
