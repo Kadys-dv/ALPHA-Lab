@@ -26,6 +26,7 @@ jobs:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       NEXT_PUBLIC_GIT_SHA: ${{ github.sha }}
+      PRODUCTION_URL: https://alpha-builders-web.cskadys.workers.dev
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -59,3 +60,34 @@ jobs:
 
       - name: Deploy to Cloudflare Workers
         run: npm run deploy:vinext
+
+      - name: Verify deployed production
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$(curl --fail --silent --show-error --retry 8 --retry-delay 2 --retry-all-errors "$PRODUCTION_URL/")"
+          printf '%s' "$root" | grep -Fq 'ALPHA'
+          printf '%s' "$root" | grep -Fq 'Base Sepolia'
+          ! printf '%s' "$root" | grep -Fq 'Base Mainnet'
+          ! printf '%s' "$root" | grep -Fq 'Comprar ALPHA'
+          ! printf '%s' "$root" | grep -Fq 'Swap ALPHA'
+          ! printf '%s' "$root" | grep -Fq 'Stake ALPHA'
+
+          curl --fail --silent --show-error --retry 8 --retry-delay 2 --retry-all-errors "$PRODUCTION_URL/api/version" > /tmp/version.json
+          curl --fail --silent --show-error --retry 8 --retry-delay 2 --retry-all-errors "$PRODUCTION_URL/api/status" > /tmp/status.json
+
+          node <<'NODE'
+          const fs = require('fs');
+          const version = JSON.parse(fs.readFileSync('/tmp/version.json', 'utf8'));
+          const status = JSON.parse(fs.readFileSync('/tmp/status.json', 'utf8'));
+          const expectedContract = '0xff15343accc4b77479ebe3c4cae32d99d4c60f48';
+          const expectedSha = process.env.GITHUB_SHA;
+
+          if (Number(version.chainId) !== 84532) throw new Error(`Unexpected chainId: ${version.chainId}`);
+          if (String(version.contract || '').toLowerCase() !== expectedContract) throw new Error(`Unexpected contract: ${version.contract}`);
+          if (version.commit !== expectedSha) throw new Error(`Deployment SHA mismatch: expected ${expectedSha}, got ${version.commit}`);
+          if (!status || typeof status !== 'object') throw new Error('Invalid /api/status payload');
+          if (!status.metrics || typeof status.metrics !== 'object') throw new Error('Missing status.metrics');
+          console.log(`Production verified at ${process.env.PRODUCTION_URL}`);
+          console.log(`Deployment commit: ${version.commit}`);
+          NODE
