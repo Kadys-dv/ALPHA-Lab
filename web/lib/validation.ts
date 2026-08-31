@@ -20,8 +20,10 @@ export function buildIssueUrl({ repoUrl, wallet }: Submission): string {
   return `https://github.com/Kadys-dv/ALPHA-Lab/issues/new?${params.toString()}`;
 }
 export function parseSubmission(body: string): Submission | null {
-  const repo = body.match(/^Repository:\s*(https:\/\/github\.com\/[^\s/]+\/[^\s/]+)\s*$/im)?.[1];
-  const wallet = body.match(/^Wallet:\s*(0x[a-fA-F0-9]{40})\s*$/im)?.[1];
+  const repo = body.match(/^Repository:\s*(https:\/\/github\.com\/[^\s/]+\/[^\s/]+)\s*$/im)?.[1]
+    ?? body.match(/### Repository\s+\n\s*(https:\/\/github\.com\/[^\s/]+\/[^\s/]+)/im)?.[1];
+  const wallet = body.match(/^Wallet:\s*(0x[a-fA-F0-9]{40})\s*$/im)?.[1]
+    ?? body.match(/### Wallet\s+\n\s*(0x[a-fA-F0-9]{40})/im)?.[1];
   if (!repo || !wallet) return null;
   const normalized = normalizeGitHubRepoUrl(repo);
   return normalized && isEvmAddress(wallet) ? { repoUrl: normalized, wallet } : null;
