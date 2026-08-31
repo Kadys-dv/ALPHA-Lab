@@ -5,13 +5,13 @@ on:
     types: [opened]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  compatibility:
-    if: github.event.issue.title == '[maintenance] cloudflare readiness'
+  migrate:
+    if: github.event.issue.title == '[maintenance] cloudflare migrate'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     defaults:
       run:
         working-directory: web
@@ -26,5 +26,19 @@ jobs:
           cache-dependency-path: web/package-lock.json
       - name: Install canonical frontend
         run: npm ci --no-audit --no-fund
-      - name: Check vinext compatibility
-        run: npx --yes vinext@latest check
+      - name: Initialize vinext for Cloudflare Workers
+        run: npx --yes vinext@latest init --skip-check --platform=cloudflare --cdn-cache=workers-cache --data-cache=none --image-optimization=none --no-prerender
+      - name: Build with vinext
+        run: npm run build:vinext
+      - name: Commit Cloudflare readiness changes
+        working-directory: .
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add web
+          if git diff --cached --quiet; then
+            echo "No migration changes"
+            exit 0
+          fi
+          git commit -m "chore: prepare ALPHA Builders for Cloudflare Workers"
+          git push origin HEAD:chore/cloudflare-readiness
