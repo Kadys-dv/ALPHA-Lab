@@ -2,33 +2,35 @@
 
 ## URL pública atual
 
-https://alpha-builders.kadys-v2.chatgpt.site
+https://alpha-builders-web.cskadys.workers.dev
+
+Esta é a URL canônica de produção. O host anterior em `chatgpt.site` permanece apenas como referência histórica e não é mais a fonte pública principal.
 
 ## Fonte canônica
 
-A implementação versionada do frontend está em `web/`.
-
-Ela foi construída a partir do comportamento já validado da experiência publicada e passa a ser a referência de desenvolvimento do ALPHA Builders. Não é apresentada como recuperação byte-a-byte dos arquivos originais do host anterior.
+A implementação versionada do frontend está em `web/` e é a referência de desenvolvimento e produção do ALPHA Builders.
 
 Principais capacidades versionadas:
 
 - Next.js App Router, React 19 e TypeScript strict;
-- estética neo-brutalista com Aurora Bloom;
-- React Three Fiber/Drei e Three.js;
+- direção visual Interactive Storytelling + Neo-Brutalismo Tátil;
+- hero “Aprenda construindo. Prove contribuindo.”;
+- React Three Fiber/Drei e Three.js com núcleo 3D isolado em `components/three/FloatingAlpha.tsx`;
 - Framer Motion;
-- layout responsivo;
+- layout responsivo e `prefers-reduced-motion`;
 - conexão EVM;
 - troca/adição de Base Sepolia;
 - listeners `accountsChanged`, `chainChanged` e `disconnect` com cleanup;
 - tratamento de carteira ausente, rede incorreta e cancelamento;
 - desafio de revisão estruturada de README;
+- prova técnica com Chain ID, supply, contrato e BaseScan;
 - validação de URL GitHub e endereço EVM;
+- consentimento explícito de testnet;
 - submissão por GitHub Issue;
 - métricas públicas de produto derivadas de Issues;
 - seção pública de Builders aceitos;
 - endpoint `/api/version` para rastreabilidade de deploy;
-- fallback para `prefers-reduced-motion`;
-- bundle adicional para Cloudflare Workers via vinext.
+- bundle e deploy para Cloudflare Workers via vinext.
 
 ## Segurança preservada
 
@@ -55,6 +57,7 @@ ALPHA-Lab/
       api/status/
       api/version/
     components/
+      three/FloatingAlpha.tsx
     lib/
     scripts/
     tests/
@@ -88,15 +91,27 @@ npm run build:vinext
 
 Esse gate não substitui o build Next.js; os dois precisam permanecer válidos.
 
+## Deploy Cloudflare
+
+`.github/workflows/cloudflare-deploy.yml` publica automaticamente mudanças de `web/**` que chegam à `main`. O modo manual continua disponível com confirmação explícita.
+
+Antes da publicação, o workflow executa todos os gates do frontend e o build vinext. Depois do deploy, valida a própria URL pública e exige:
+
+- marcador `ALPHA`;
+- `Base Sepolia`;
+- hero atual `Aprenda construindo.`;
+- ausência de Base Mainnet, compra, swap e staking;
+- `/api/version` válido;
+- `/api/status` válido;
+- Chain ID `84532`;
+- contrato oficial;
+- SHA de produção exatamente igual ao commit implantado.
+
 ## Smoke test
 
-`.github/workflows/frontend-smoke.yml` compila e inicia a fonte canônica em ambiente efêmero, valida marcadores de ALPHA/Base Sepolia e o endpoint de versão. A URL legada também pode ser sondada sem bloquear a CI canônica.
+`.github/workflows/frontend-smoke.yml` compila e inicia a fonte canônica em ambiente efêmero.
 
-O host `chatgpt.site` não prova associação retroativa a um commit. Essa limitação só desaparece quando a URL canônica passar a ser publicada diretamente a partir de `web/`.
-
-## Cloudflare Workers
-
-A configuração de portabilidade usa vinext como camada adicional, preservando os scripts Next.js originais. O primeiro deploy foi deliberadamente preparado sem KV e sem Cloudflare Images, usando Workers Cache para CDN. Detalhes estão em `docs/CLOUDFLARE.md`.
+`.github/workflows/cloudflare-production-smoke.yml` testa a implantação pública real em Cloudflare Workers, incluindo página, APIs e invariantes de rede/contrato. Esse smoke também roda em agenda periódica.
 
 ## Contribuições
 
@@ -136,6 +151,6 @@ A avaliação de produto deve priorizar submissão, conclusão, aceitação e re
 
 ## Rastreabilidade
 
-`/api/version` retorna `version`, `chainId`, `contract` e o SHA disponível no ambiente. O build de CI injeta `NEXT_PUBLIC_GIT_SHA`.
+`/api/version` retorna `version`, `chainId`, `contract` e o SHA disponível no ambiente. O build/deploy injeta `NEXT_PUBLIC_GIT_SHA`.
 
-A URL atual em `chatgpt.site` não oferece, por meio deste repositório, controle de deploy ou associação retroativa a um commit. A futura URL canônica independente deve ser publicada a partir de `web/` e validada por smoke test antes de substituir o host legado.
+A URL Cloudflare é publicada diretamente a partir de `web/`, e o deploy só é considerado válido depois que o smoke pós-publicação confirma a correspondência exata do SHA.

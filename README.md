@@ -12,22 +12,23 @@ O contrato já está publicado e validado em testnet. ALPHA não está à venda,
 | Testes Solidity | 7 aprovados |
 | Invariantes de segurança/configuração | 18 aprovadas |
 | Deploy Base Sepolia | Validado |
-| ALPHA Builders | Publicado |
+| ALPHA Builders | Publicado no Cloudflare Workers |
 | Fonte canônica do frontend | Versionada em `web/` |
 | Utilidade inicial | Revisão estruturada de README |
 | Submissão de contribuições | GitHub Issue real |
 | Validação técnica de submissões | GitHub Actions |
 | Aprovação final | Revisão humana |
-| Build Cloudflare Workers | Preparado via vinext |
+| Build Cloudflare Workers | Validado via vinext |
+| Deploy de produção | Automático em mudanças de `web/**` na `main` |
 | Venda, liquidez e mainnet | Bloqueadas |
 
 ## ALPHA Builders
 
-Experiência pública atual: https://alpha-builders.kadys-v2.chatgpt.site
+Experiência pública canônica: https://alpha-builders-web.cskadys.workers.dev
 
-A pasta `web/` contém a fonte canônica e reproduzível do ALPHA Builders, construída a partir do comportamento validado da versão publicada. Ela preserva a identidade neo-brutalista, animações com Framer Motion, elemento 3D com React Three Fiber/Drei, carteira EVM, Base Sepolia, desafio de README, métricas públicas de produto e histórico de Builders aceitos.
+A pasta `web/` contém a fonte canônica e reproduzível do ALPHA Builders. A experiência atual segue a direção **Interactive Storytelling + Neo-Brutalismo Tátil**, com hero “Aprenda construindo. Prove contribuindo.”, animações com Framer Motion, núcleo 3D com React Three Fiber/Drei, carteira EVM, Base Sepolia, desafio de README, prova técnica, métricas públicas de produto e histórico de Builders aceitos.
 
-A fonte em `web/` não é apresentada como recuperação byte-a-byte dos arquivos originais do host anterior; ela é a implementação versionada que passa a servir como referência de desenvolvimento daqui em diante.
+O host anterior em `chatgpt.site` é apenas legado e não é mais a URL canônica do projeto.
 
 O fluxo de carteira permanece deliberadamente sem operações financeiras: não há compra, transferência, `approve`, `permit`, swap, bridge, staking, assinatura de transação financeira ou integração com Base Mainnet.
 
@@ -43,9 +44,9 @@ npm run build
 npm run dev
 ```
 
-`web/package-lock.json` está versionado. A CI exige instalação reproduzível com `npm ci`; não há mais bootstrap temporário de lockfile.
+`web/package-lock.json` está versionado. A CI exige instalação reproduzível com `npm ci`; não há bootstrap temporário de lockfile.
 
-Para validar também o bundle preparado para Cloudflare Workers:
+Para validar também o bundle do Cloudflare Workers:
 
 ```bash
 npm run build:vinext
@@ -67,13 +68,13 @@ Submissões do ALPHA Builders são Issues públicas. A automação:
 
 A aprovação `accepted` permanece uma decisão humana. A seção pública de Builders consome apenas dados públicos sanitizados de Issues aceitas.
 
-## Rastreabilidade de deploy
+## Rastreabilidade e produção
 
-O frontend expõe `/api/version`, com versão, Chain ID, contrato e SHA de commit quando o ambiente de hospedagem fornece `VERCEL_GIT_COMMIT_SHA`, `GITHUB_SHA` ou `NEXT_PUBLIC_GIT_SHA`. O CI injeta `NEXT_PUBLIC_GIT_SHA` durante o build.
+O frontend expõe `/api/version`, com versão, Chain ID, contrato e SHA de commit. O deploy Cloudflare injeta `NEXT_PUBLIC_GIT_SHA` e valida depois da publicação que o SHA servido em produção é exatamente o commit implantado.
 
-A URL atual em `chatgpt.site` ainda não é controlada por este repositório, então ela não pode ser retroativamente vinculada a um commit. Novos deploys reproduzíveis devem partir da fonte `web/` e publicar o SHA pelo endpoint de versão.
+`.github/workflows/cloudflare-deploy.yml` publica automaticamente quando `web/**` muda na `main` e mantém também um disparo manual protegido. Antes do deploy ele executa instalação reproduzível, lint, TypeScript strict, testes, build Next.js, audit e build vinext. Depois do deploy valida a página pública, o hero atual, Base Sepolia, `/api/version`, `/api/status`, Chain ID, contrato e ausência de CTAs financeiros proibidos.
 
-A fonte também está preparada para uma implantação independente em Cloudflare Workers usando vinext, Workers Cache e sem KV ou Cloudflare Images no primeiro deploy. A URL canônica só deve mudar depois de um deploy independente validado por smoke test.
+`.github/workflows/cloudflare-production-smoke.yml` mantém um smoke real da URL pública.
 
 ## Deploy público do contrato
 
@@ -144,6 +145,7 @@ As métricas prioritárias são de produto: submissões, itens em revisão, cont
 - [Hipótese de produto ALPHA Builders](docs/PRODUCT.md)
 - [Frontend e pipeline](docs/FRONTEND.md)
 - [Cloudflare Workers](docs/CLOUDFLARE.md)
+- [Produção](docs/PRODUCTION.md)
 - [Roteiro de descoberta](docs/DISCOVERY.md)
 - [Roadmap](docs/ROADMAP.md)
 - [Política de segurança](docs/SECURITY.md)
