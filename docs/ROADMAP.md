@@ -29,14 +29,14 @@
 
 Contrato validado: `0xff15343aCcc4B77479EBE3C4cae32d99d4c60f48`.
 
-## Fase 4 — descoberta de produto: próxima
+## Fase 4 — descoberta de produto: em andamento
 
-- [ ] escolher um público específico
-- [ ] definir um problema que possa ser validado
+- [x] escolher desenvolvedores iniciantes como público
+- [x] definir conclusão e apresentação de projetos como problema inicial
 - [ ] entrevistar 20 usuários potenciais
-- [ ] escolher uma utilidade mensurável para ALPHA
-- [ ] documentar regras de distribuição e antiabuso
-- [ ] manter o contrato principal inalterado
+- [x] escolher revisão estruturada de README como primeira utilidade
+- [x] documentar hipótese inicial de distribuição e antiabuso
+- [x] manter o contrato principal inalterado durante a descoberta
 
 ## Fase 5 — piloto gratuito
 

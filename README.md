@@ -94,6 +94,8 @@ Operação gratuita é uma meta apenas para o laboratório e a validação inici
 - [Desenho do token](docs/DESIGN.md)
 - [Deploy e evidências da Base Sepolia](docs/BASE-SEPOLIA.md)
 - [Estratégia de monetização](docs/MONETIZATION.md)
+- [Hipótese de produto ALPHA Builders](docs/PRODUCT.md)
+- [Roteiro de descoberta](docs/DISCOVERY.md)
 - [Roadmap](docs/ROADMAP.md)
 - [Política de segurança](docs/SECURITY.md)
 

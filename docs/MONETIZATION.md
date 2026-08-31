@@ -16,7 +16,9 @@ Não existe garantia de lucro nem operação permanentemente gratuita. A meta in
 
 ## Hipótese inicial de negócio
 
-O primeiro experimento não venderá ALPHA. Será oferecido um serviço digital simples, cobrado em reais, para um público ainda a definir. Usuários poderão receber ALPHA na Base Sepolia por ações verificáveis e usar o token para acessar uma vantagem concreta dentro do piloto.
+O primeiro experimento será o **ALPHA Builders**, voltado a desenvolvedores iniciantes que precisam concluir e apresentar projetos de portfólio. O piloto não venderá ALPHA. Participantes poderão receber ALPHA na Base Sepolia por entregas verificáveis e usar o token para obter revisão estruturada de README.
+
+A primeira oferta paga candidata será uma revisão individual de portfólio ou projeto, cobrada em reais. ALPHA poderá conceder desconto, mas não será meio de investimento nem promessa de valorização.
 
 O experimento somente será considerado validado se houver uso repetido da vantagem e disposição real de pagar pelo serviço, independentemente do preço do token.
 
@@ -87,4 +89,4 @@ O projeto não avança para venda, liquidez ou mainnet apenas porque o contrato 
 
 ## Próxima decisão
 
-Definir um público e um problema concretos. Até essa definição, o contrato permanece inalterado e a Base Sepolia é o único ambiente público autorizado.
+Executar 20 entrevistas usando `DISCOVERY.md`. Até o gate de descoberta ser atingido, o contrato permanece inalterado e a Base Sepolia é o único ambiente público autorizado.
