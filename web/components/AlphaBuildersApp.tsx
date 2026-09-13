@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight,ArrowUpRight,Check,Clipboard,Code2,Network,ShieldCheck,Sparkles,Wallet,X } from "lucide-react";
+import { ArrowRight,ArrowUpRight,Check,Clipboard,Code2,Menu,Network,ShieldCheck,Sparkles,Wallet,X } from "lucide-react";
 import { useEffect,useState } from "react";
 import BuildersSection from "@/components/builders/BuildersSection";
 import SubmissionSection from "@/components/submission/SubmissionSection";
@@ -14,7 +14,6 @@ import { ALPHA_CONTRACT,ALPHA_SUPPLY } from "@/lib/constants";
 const shortAddress=(value:string)=>value?`${value.slice(0,6)}…${value.slice(-4)}`:"";
 const explorerUrl=`https://sepolia.basescan.org/address/${ALPHA_CONTRACT}`;
 const repositoryUrl="https://github.com/Kadys-dv/ALPHA-Lab";
-const startPilotUrl="https://github.com/Kadys-dv/ALPHA-Lab/issues/new?template=alpha-pilot-start.yml";
 const steps=[
 ["01","Conecte uma carteira de teste","O acesso é solicitado somente quando você clicar. Uma assinatura de mensagem comprova o controle do endereço."],
 ["02","Confirme a Base Sepolia","A experiência reconhece o Chain ID 84532 e ajuda a adicionar ou trocar a rede."],
@@ -31,6 +30,7 @@ const status=usePublicStatus();
 const [copied,setCopied]=useState(false);
 const [stickyVisible,setStickyVisible]=useState(false);
 const [stickyDismissed,setStickyDismissed]=useState(false);
+const [mobileMenuOpen,setMobileMenuOpen]=useState(false);
 useEffect(()=>{const onScroll=()=>setStickyVisible(window.scrollY>window.innerHeight*.72);onScroll();window.addEventListener("scroll",onScroll,{passive:true});return()=>window.removeEventListener("scroll",onScroll)},[]);
 const copyContract=async()=>{try{await navigator.clipboard.writeText(ALPHA_CONTRACT);setCopied(true);window.setTimeout(()=>setCopied(false),1800)}catch{setCopied(false)}};
 const exampleBuilder=status.builders[0];
@@ -40,10 +40,12 @@ return <main id="main-content">
 <a className="brand-lockup" href="#main-content" aria-label="ALPHA Builders, início"><span className="brand-mark">A</span><span><strong>ALPHA</strong><small>BUILDERS / LAB</small></span></a>
 <nav className="desktop-nav" aria-label="Navegação principal"><a href="#challenge">Desafio</a><a href="#flow">Como funciona</a><a href="#proof">Prova técnica</a><a href="#builders">Builders</a></nav>
 <div className="wallet-cluster"><a className="header-link" href={explorerUrl} target="_blank" rel="noreferrer">Contrato <ArrowUpRight size={15}/></a><button className="neo-button compact" type="button" onClick={()=>void connect()}><Wallet size={17}/>{account?shortAddress(account):"Conectar carteira"}</button></div>
+<button className="mobile-menu-button" type="button" aria-expanded={mobileMenuOpen} aria-controls="mobile-navigation" aria-label={mobileMenuOpen?"Fechar navegação":"Abrir navegação"} onClick={()=>setMobileMenuOpen((open)=>!open)}>{mobileMenuOpen?<X size={20}/>:<Menu size={20}/>}</button>
 </header>
+{mobileMenuOpen&&<nav className="mobile-nav" id="mobile-navigation" aria-label="Navegação mobile">{[["#challenge","Desafio"],["#flow","Como funciona"],["#proof","Prova técnica"],["#builders","Builders"],["#submit","Participar"]].map(([href,label])=><a key={href} href={href} onClick={()=>setMobileMenuOpen(false)}>{label}</a>)}</nav>}
 <div className="network-strip" aria-live="polite"><span className="network-dot"/><strong>Base Sepolia</strong><span>Chain ID 84532</span>{account&&<span className={onCorrectNetwork?"network-ok":"network-warn"}>{onCorrectNetwork?"Rede correta":"Rede incorreta"}</span>}{walletError&&<span className="inline-error">{walletError}</span>}</div>
 <section className="hero-latest">
-<div className="hero-copy"><div className="pilot-badge"><Sparkles size={15}/> Programa piloto · Base Sepolia</div><h1>Aprenda construindo. <span>Prove contribuindo.</span></h1><p className="hero-lead">Um laboratório open source para transformar pequenas contribuições públicas em evidências técnicas verificáveis — sem venda de token, sem promessa financeira e sem atalhos de portfólio.</p><div className="hero-actions"><a className="neo-button primary" href={startPilotUrl} target="_blank" rel="noreferrer">Iniciar ciclo <ArrowRight size={18}/></a><a className="neo-button secondary" href="#challenge"><Code2 size={18}/> Ver desafio</a></div><div className="hero-footnote"><ShieldCheck size={18}/> A prova de carteira usa somente assinatura de mensagem. Nenhuma transação, compra, transferência ou taxa é solicitada.</div></div>
+<div className="hero-copy"><div className="pilot-badge"><Sparkles size={15}/> Programa piloto · Base Sepolia</div><h1>Aprenda construindo. <span>Prove contribuindo.</span></h1><p className="hero-lead">Transforme uma melhoria pública em evidência técnica verificável. Escolha um projeto open source, contribua pelo GitHub e acompanhe a revisão — sem compra de token ou promessa financeira.</p><div className="hero-actions"><a className="neo-button primary" href="#challenge">Começar desafio <ArrowRight size={18}/></a><a className="neo-button secondary" href="#builders"><Code2 size={18}/> Ver contribuições</a></div><div className="hero-footnote"><ShieldCheck size={18}/> A prova de carteira usa somente assinatura de mensagem. Nenhuma transação, compra, transferência ou taxa é solicitada.</div></div>
 <div className="hero-visual"><div className="visual-frame"><span className="corner-label top-left">ALPHA CORE / TESTNET</span><span className="corner-label bottom-right">84532</span><PerformanceAwareAlpha/><div className="visual-card visual-card-a"><Network size={17}/> Base Sepolia</div><div className="visual-card visual-card-b"><Code2 size={17}/> Open source</div></div></div>
 </section>
 <PurposePanel/>
@@ -52,6 +54,5 @@ return <main id="main-content">
 <section className="proof-section section-shell" id="proof"><div className="proof-intro"><div className="section-kicker">DADOS VERIFICÁVEIS</div><h2>Não confie no marketing. <span>Confira a prova técnica.</span></h2><p>Os dados abaixo são fatos públicos do projeto e da Base Sepolia. Nenhum contador financeiro ou número de usuários é inventado.</p></div><div className="proof-grid"><article className="proof-card featured"><small>REDE</small><strong>Base Sepolia</strong><span>Testnet EVM</span></article><article className="proof-card"><small>CHAIN ID</small><strong>84532</strong><span>0x14a34</span></article><article className="proof-card"><small>SUPPLY</small><strong>{ALPHA_SUPPLY}</strong><span>ALPHA</span></article><article className="proof-card"><small>DECIMAIS</small><strong>18</strong><span>ERC-20</span></article><article className="proof-card contract-proof"><small>CONTRATO</small><code>{ALPHA_CONTRACT}</code><div className="proof-actions"><button type="button" onClick={()=>void copyContract()}><Clipboard size={16}/> {copied?"Copiado":"Copiar"}</button><a href={explorerUrl} target="_blank" rel="noreferrer">BaseScan <ArrowUpRight size={16}/></a></div></article></div></section>
 <SubmissionSection account={account} onCorrectNetwork={onCorrectNetwork} connect={connect} signMessage={signMessage} exampleBuilderIssue={exampleBuilder?.issue}/>
 <BuildersSection status={status}/>
-<footer className="site-footer"><div className="footer-brand"><span className="brand-mark">A</span><div><strong>ALPHA Builders</strong><small>Open source · Base Sepolia</small></div></div><div className="footer-links"><a href={repositoryUrl} target="_blank" rel="noreferrer">GitHub</a><a href={explorerUrl} target="_blank" rel="noreferrer">Contrato</a></div><p>ALPHA é um token experimental de testnet. Não está à venda, não representa participação societária, investimento ou promessa de retorno financeiro.</p></footer>
 {stickyVisible&&!stickyDismissed&&<aside className="sticky-pilot" aria-label="Atalho para o desafio piloto"><div><small>PRONTO PARA COMEÇAR?</small><strong>Construa sua primeira prova pública.</strong></div><a href="#challenge">Começar desafio <ArrowRight size={16}/></a><button type="button" onClick={()=>setStickyDismissed(true)} aria-label="Dispensar atalho"><X size={17}/></button></aside>}
 </main>}
