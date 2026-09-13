@@ -4,6 +4,7 @@ export const GITHUB_REPOSITORY = "Kadys-dv/ALPHA-Lab";
 const ACCEPTED_AT = /<!-- alpha-accepted-at: ([^ ]+) -->/;
 const REVIEW_RECORD = /<!-- alpha-review-record\s*\n([\s\S]*?)\n-->/;
 const RUBRIC_KEYS = ["context", "installation", "decisions", "tests", "demo"] as const;
+const REVIEW_SLA_HOURS = 48;
 
 export type GitHubIssue = {
   number: number;
@@ -41,7 +42,12 @@ export async function fetchIssuesByLabel(
         signal: AbortSignal.timeout(8_000),
       });
       if (!response.ok) return { ok: false, items: [], error: `github_${response.status}` };
-      const pageItems = (await response.json()) as GitHubIssue[];
+      const payload: unknown = await response.json();
+      if (!Array.isArray(payload)) return { ok: false, items: [], error: "github_invalid_payload" };
+      const pageItems = payload.filter((item): item is GitHubIssue =>
+        typeof item === "object" && item !== null &&
+        typeof (item as { number?: unknown }).number === "number",
+      );
       items.push(...pageItems.filter((issue) => !issue.pull_request));
       if (pageItems.length < 100) break;
     }
@@ -66,6 +72,7 @@ export function buildPublicStatus(submitted: IssueSource, underReview: IssueSour
   });
   const builders = parsedAccepted.slice(0, 12).map((builder) => ({
     issue: builder.issue,
+    cycleId: builder.cycleId ?? null,
     repoUrl: builder.repoUrl,
     evidenceUrl: builder.evidenceUrl,
     wallet: `${builder.wallet.slice(0, 6)}…${builder.wallet.slice(-4)}`,
@@ -110,6 +117,7 @@ export function buildPublicStatus(submitted: IssueSource, underReview: IssueSour
   }
   const feedbackItems = [...feedbackByParticipant.values()];
   const countFeedback = (label: string, expected: string) => feedbackItems.filter((issue) => feedbackValue(issue.body, label) === expected).length;
+  const privateFeedbackRequests = feedback.ok ? feedbackItems.filter((issue) => feedbackValue(issue.body, "Preferencia de feedback") === "privado").length : null;
   const participantIds = (source: IssueSource) => new Set(source.items.flatMap((issue) => issue.user?.login ? [issue.user.login.toLowerCase()] : []));
   const startedParticipants = started.ok ? participantIds(started) : null;
   const submittedParticipants = submitted.ok ? participantIds(submitted) : null;
@@ -117,6 +125,27 @@ export function buildPublicStatus(submitted: IssueSource, underReview: IssueSour
     ? [...startedParticipants].filter((participant) => submittedParticipants.has(participant)).length
     : null;
   const startedCount = startedParticipants?.size ?? null;
+  const startedCohort = started.ok ? started.items.slice(0, 10).map((issue) => ({
+    issue: issue.number,
+    author: issue.user?.login ?? "unknown",
+    repository: feedbackValue(issue.body, "Repository") ?? null,
+    openedAt: issue.created_at ?? null,
+  })) : [];
+  const now = Date.now();
+  const reviewQueue = reviewIssues
+    .map((issue) => {
+      const openedAt = issue.created_at ?? null;
+      const ageHours = openedAt && !Number.isNaN(Date.parse(openedAt)) ? round((now - Date.parse(openedAt)) / 3_600_000) : null;
+      return {
+        issue: issue.number,
+        author: issue.user?.login ?? "unknown",
+        openedAt,
+        ageHours,
+        slaBreached: ageHours !== null ? ageHours > REVIEW_SLA_HOURS : false,
+      };
+    })
+    .sort((a, b) => (b.ageHours ?? -1) - (a.ageHours ?? -1))
+    .slice(0, 10);
   const successfulSources = [submitted.ok, underReview.ok, accepted.ok, started.ok, feedback.ok].filter(Boolean).length;
 
   return {
@@ -139,13 +168,22 @@ export function buildPublicStatus(submitted: IssueSource, underReview: IssueSour
       medianReviewHours: percentile(sortedReviewHours, 0.5),
       p90ReviewHours: percentile(sortedReviewHours, 0.9),
       feedbackCount: feedback.ok ? feedbackItems.length : null,
+      privateFeedbackRequests,
       usefulRate: feedback.ok ? feedbackItems.length ? round((countFeedback("A revisão foi útil\\?", "sim") / feedbackItems.length) * 100) : null : null,
       appliedRate: feedback.ok ? feedbackItems.length ? round((countFeedback("Você aplicou a recomendação principal\\?", "sim") / feedbackItems.length) * 100) : null : null,
       repeatIntentRate: feedback.ok ? feedbackItems.length ? round((countFeedback("Você faria outro ciclo nas próximas quatro semanas\\?", "sim") / feedbackItems.length) * 100) : null : null,
       willingnessToPay: feedback.ok && feedbackItems.length ? countFeedback("Você pagaria por uma revisão individual\\?", "sim") : null,
     },
     rubric: rubricCounts,
-    targets: { participants: 10, submissions: 7, repeatBuilders: 5, willingnessToPay: 3, reviewSlaHours: 48 },
+    rubricVersion: 1,
+    targets: { participants: 10, submissions: 7, repeatBuilders: 5, willingnessToPay: 3, reviewSlaHours: REVIEW_SLA_HOURS },
+    collections: {
+      builders: { visible: builders.length, total: parsedAccepted.length, limit: 12 },
+      startedCohort: { visible: startedCohort.length, total: started.ok ? started.items.length : null, limit: 10 },
+      reviewQueue: { visible: reviewQueue.length, total: reviewIssues.length, limit: 10 },
+    },
+    startedCohort,
+    reviewQueue,
     builders,
   };
 }

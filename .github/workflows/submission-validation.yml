@@ -7,17 +7,23 @@ on:
 permissions:
   contents: read
   issues: write
+  pull-requests: read
+
+concurrency:
+  group: alpha-issue-${{ github.event.issue.number || github.run_id }}
+  cancel-in-progress: true
 
 jobs:
   validate:
     if: startsWith(github.event.issue.title, '[ALPHA Builders]')
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout validation code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Validate public submission
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           script: |
             const { validateSubmission } = require('./scripts/submission-validation.cjs');

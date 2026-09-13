@@ -26,9 +26,9 @@ describe("public status", () => {
 
   it("separates completion, acceptance and feedback metrics", () => {
     const submitted = source([{ number: 1, user: { login: "one" } }, { number: 2, user: { login: "two" } }]);
-    const started = source([{ number: 10, user: { login: "one" } }, { number: 11, user: { login: "two" } }, { number: 12, user: { login: "three" } }, { number: 13, user: { login: "four" } }]);
+    const started = source([{ number: 10, body: "### Repository\n\nhttps://github.com/acme/demo", user: { login: "one" } }, { number: 11, user: { login: "two" } }, { number: 12, user: { login: "three" } }, { number: 13, user: { login: "four" } }]);
     const accepted = source([{ number: 1, labels: [{ name: "submission" }] }]);
-    const feedbackBody = "### Submission\n\n1\n\n### A revisão foi útil?\n\nsim\n\n### Você aplicou a recomendação principal?\n\nsim\n\n### Você faria outro ciclo nas próximas quatro semanas?\n\ntalvez\n\n### Você pagaria por uma revisão individual?\n\nsim";
+    const feedbackBody = "### Submission\n\n1\n\n### Preferencia de feedback\n\nprivado\n\n### A revisão foi útil?\n\nsim\n\n### Você aplicou a recomendação principal?\n\nsim\n\n### Você faria outro ciclo nas próximas quatro semanas?\n\ntalvez\n\n### Você pagaria por uma revisão individual?\n\nsim";
     const feedback = source([
       { number: 20, body: feedbackBody, user: { login: "one" }, updated_at: "2026-09-02T00:00:00Z" },
       { number: 21, body: feedbackBody, user: { login: "one" }, updated_at: "2026-09-01T00:00:00Z" },
@@ -41,6 +41,23 @@ describe("public status", () => {
     expect(result.metrics.usefulRate).toBe(100);
     expect(result.metrics.willingnessToPay).toBe(1);
     expect(result.metrics.feedbackCount).toBe(1);
+    expect(result.metrics.privateFeedbackRequests).toBe(1);
+    expect(result.startedCohort[0]).toMatchObject({ issue: 10, author: "one", repository: "https://github.com/acme/demo" });
+    expect(result.rubricVersion).toBe(1);
+    expect(result.collections).toMatchObject({
+      builders: { visible: 0, total: 0, limit: 12 },
+      startedCohort: { visible: 4, total: 4, limit: 10 },
+      reviewQueue: { visible: 0, total: 0, limit: 10 },
+    });
+  });
+
+  it("exposes an SLA queue for under-review submissions", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-09-13T12:00:00.000Z"));
+    const review = source([{ number: 2, created_at: "2026-09-11T11:00:00.000Z", user: { login: "builder" }, labels: [{ name: "submission" }, { name: "under-review" }] }]);
+    const result = buildPublicStatus(source([]), review, source([]), source([]), source([]));
+    expect(result.reviewQueue[0]).toMatchObject({ issue: 2, author: "builder", ageHours: 49, slaBreached: true });
+    vi.useRealTimers();
   });
 
   it("does not invent a review duration for legacy acceptance", () => {

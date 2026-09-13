@@ -64,6 +64,31 @@ async function mockWallet(page) {
   }, { account: ACCOUNT });
 }
 
+async function mockWalletProof(page) {
+  await page.route("**/api/wallet-proof", async (route) => {
+    if (route.request().method() === "GET") {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        headers: { "X-Request-Id": "e2e-wallet-proof" },
+        body: JSON.stringify({
+          nonce: `0x${"a".repeat(64)}`,
+          createdAt: "2026-09-13T00:00:00.000Z",
+          expiresAt: "2026-09-13T00:05:00.000Z",
+          requestId: "e2e-wallet-proof",
+        }),
+      });
+      return;
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      headers: { "X-Request-Id": "e2e-wallet-proof" },
+      body: JSON.stringify({ ok: true, requestId: "e2e-wallet-proof" }),
+    });
+  });
+}
+
 test.beforeEach(async ({ page }) => {
   await mockStatus(page);
 });
@@ -96,6 +121,7 @@ test("home keeps critical content keyboard and WCAG accessible", async ({ page }
 
 test("submission accepts a public Pull Request with a testnet wallet", async ({ page }) => {
   await mockWallet(page);
+  await mockWalletProof(page);
   await page.goto(`${BASE_URL}/`);
 
   await page.locator("#repo-url").fill("https://github.com/Kadys-dv/ALPHA-Lab/pull/29");
@@ -107,6 +133,17 @@ test("submission accepts a public Pull Request with a testnet wallet", async ({ 
   const opened = await page.evaluate(() => window.__alphaOpenedUrl);
   expect(opened).toContain("github.com/Kadys-dv/ALPHA-Lab/issues/new");
   expect(opened).toContain("pull%2F29");
+});
+
+test("wallet proof challenge exposes the request contract", async ({ page }) => {
+  const response = await page.request.get(`${BASE_URL}/api/wallet-proof`);
+  expect(response.ok()).toBeTruthy();
+  expect(response.headers()["x-request-id"]).toBeTruthy();
+  const payload = await response.json();
+  expect(payload.nonce).toMatch(/^0x[a-f0-9]{64}$/);
+  expect(Date.parse(payload.createdAt)).not.toBeNaN();
+  expect(Date.parse(payload.expiresAt)).toBeGreaterThan(Date.parse(payload.createdAt));
+  expect(payload.requestId).toBe(response.headers()["x-request-id"]);
 });
 
 test("submission rejects evidence outside github.com", async ({ page }) => {

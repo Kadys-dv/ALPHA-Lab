@@ -7,6 +7,14 @@ body:
     attributes:
       value: Este registro mede início e desistência sem analytics de navegação. Não informe dados pessoais sensíveis.
   - type: input
+    id: cycle
+    attributes:
+      label: Cycle ID
+      description: Identificador do ciclo, quando ja tiver sido gerado pelo site.
+      placeholder: alpha-abcdef123456
+    validations:
+      required: false
+  - type: input
     id: repository
     attributes:
       label: Repository

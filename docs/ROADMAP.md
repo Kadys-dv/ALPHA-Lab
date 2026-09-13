@@ -58,6 +58,21 @@ Site atual: https://alpha-builders-web.cskadys.workers.dev
 - [x] documentar limitação de rastreabilidade do host atual
 - [x] versionar `web/package-lock.json` gerado e validado pelo CI
 - [x] migrar o deploy para uma hospedagem diretamente ligada ao repositório/commit
+- [x] adicionar requestId e sinalização explícita de freshness aos endpoints públicos
+- [x] tornar Browser Quality reproduzível com `qa/package-lock.json`
+- [x] tornar validação de Issues idempotente e concorrente-segura no workflow
+- [x] compartilhar constantes do contrato de submissão entre frontend e Action
+- [x] não consumir nonce quando a assinatura falha
+- [x] propagar requestId entre desafio, validação e resposta da prova
+- [x] distinguir resposta atual degradada de fonte GitHub fresca no endpoint de status
+- [x] exibir estado degradado e idade do snapshot na tela de operações
+- [x] limitar abuso local do endpoint de prova e rejeitar payloads excessivos
+- [x] declarar limites das listas públicas de builders, coorte e fila
+- [x] monitorar dependências npm de contrato, frontend e QA com Dependabot
+- [x] monitorar atualizações de GitHub Actions com Dependabot
+- [x] executar análise CodeQL para JavaScript/TypeScript
+- [x] fixar Actions de CI nos SHAs verificados dos releases usados
+- [ ] habilitar secret scanning e push protection nas configurações do repositório
 
 ## Fase 6 — pipeline de contribuições: implementada tecnicamente
 
@@ -73,6 +88,9 @@ Site atual: https://alpha-builders-web.cskadys.workers.dev
 - [x] sanitizar os campos publicados
 - [x] métricas públicas de submissões, revisão e aceite
 - [ ] validar o workflow com submissões reais após merge na `main`
+- [ ] provisionar/testar KV ou D1 antes de declarar nonce e snapshot duráveis em produção
+- [ ] validar replay concorrente em múltiplos isolates Cloudflare
+- [ ] validar Browser Quality em execução agendada após atualização do lockfile
 
 ## Fase 6.1 — piloto com usuários
 

@@ -10,6 +10,14 @@ body:
         Esta submissão é pública e voltada ao laboratório educacional ALPHA Builders em Base Sepolia.
         Nunca envie chave privada, seed phrase, e-mail, documento ou outro dado pessoal sensível.
   - type: input
+    id: cycle
+    attributes:
+      label: Cycle ID
+      description: Identificador publico gerado pelo site para ligar inicio, submissao e feedback.
+      placeholder: alpha-abcdef123456
+    validations:
+      required: false
+  - type: input
     id: repository
     attributes:
       label: Repository
@@ -30,7 +38,7 @@ body:
     attributes:
       label: Wallet
       description: Endereço EVM público usado apenas como identificador verificável de testnet.
-      placeholder: 0x0000000000000000000000000000000000000000
+      placeholder: "0x0000000000000000000000000000000000000000"
     validations:
       required: true
   - type: input
@@ -49,6 +57,14 @@ body:
       placeholder: 0x...
     validations:
       required: true
+  - type: input
+    id: proof_created_at
+    attributes:
+      label: Proof Created At
+      description: Instante ISO assinado junto com a prova. A validacao automatica aceita ate 15 minutos.
+      placeholder: "2026-09-13T12:00:00.000Z"
+    validations:
+      required: false
   - type: checkboxes
     id: consent
     attributes:

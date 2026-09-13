@@ -1,0 +1,324 @@
+html,
+body {
+  overflow-x: clip;
+}
+
+:root {
+  --surface-elevated: rgba(20, 20, 27, 0.88);
+  --focus-ring: 0 0 0 3px rgba(34, 211, 238, 0.24);
+}
+
+.site-header {
+  padding-block: 0.7rem;
+  background: rgba(9, 9, 11, 0.88);
+}
+
+.hero-latest {
+  position: relative;
+  isolation: isolate;
+}
+
+.hero-latest::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: min(48vw, 620px);
+  height: min(48vw, 620px);
+  top: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.16), transparent 68%);
+  pointer-events: none;
+}
+
+.hero-copy h1 {
+  max-width: 850px;
+  text-wrap: balance;
+}
+
+.hero-lead {
+  max-width: 640px;
+  text-wrap: balance;
+}
+
+.neo-button {
+  border-radius: 5px;
+}
+
+.neo-button:focus-visible,
+.mobile-menu-button:focus-visible,
+.mobile-nav a:focus-visible {
+  box-shadow: var(--focus-ring);
+}
+
+.visual-frame,
+.purpose-panel,
+.task-panel,
+.submission-form {
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.24);
+}
+
+.flow-card,
+.proof-card,
+.builder-card,
+.metric-card {
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.flow-card:hover,
+.proof-card:hover,
+.builder-card:hover,
+.metric-card:hover {
+  border-color: rgba(103, 232, 249, 0.38);
+}
+
+.metrics-grid {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.metric-card strong {
+  color: #f7f5f1;
+}
+
+.sticky-pilot {
+  border-radius: 8px;
+}
+
+/* Brand layer: one accent system, calmer surfaces, and clearer product hierarchy. */
+:root {
+  --brand-violet: #8b5cf6;
+  --brand-cyan: #67e8f9;
+  --brand-lime: #d9f99d;
+  --surface-border: rgba(255, 255, 255, 0.16);
+}
+
+body {
+  background:
+    radial-gradient(circle at 50% -12%, rgba(139, 92, 246, 0.12), transparent 34rem),
+    var(--bg);
+}
+
+body::after {
+  opacity: 0.12;
+  background-size: 64px 64px;
+}
+
+.site-header {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.brand-mark {
+  border-radius: 10px;
+  border-width: 1px;
+  border-color: rgba(255, 255, 255, 0.72);
+  background: linear-gradient(145deg, var(--brand-violet), #c026d3);
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.26);
+}
+
+.desktop-nav a,
+.header-link {
+  position: relative;
+}
+
+.desktop-nav a::after,
+.header-link::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -0.55rem;
+  left: 0;
+  height: 1px;
+  transform: scaleX(0);
+  transform-origin: right;
+  background: var(--brand-cyan);
+  transition: transform 180ms ease;
+}
+
+.desktop-nav a:hover::after,
+.desktop-nav a:focus-visible::after,
+.header-link:hover::after,
+.header-link:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.network-strip {
+  background: rgba(9, 9, 11, 0.58);
+  border-bottom-color: rgba(103, 232, 249, 0.14);
+}
+
+.hero-copy h1 {
+  font-size: clamp(3.2rem, 6.2vw, 6.5rem);
+  line-height: 0.9;
+  letter-spacing: -0.065em;
+}
+
+.hero-copy h1 span {
+  background: linear-gradient(105deg, #a78bfa 0%, var(--brand-violet) 48%, var(--brand-cyan) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.pilot-badge {
+  border-color: rgba(103, 232, 249, 0.3);
+  border-radius: 999px;
+  color: #e0f2fe;
+  background: rgba(103, 232, 249, 0.06);
+}
+
+.neo-button {
+  border-radius: 8px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+}
+
+.neo-button:hover {
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.32);
+}
+
+.neo-button.primary {
+  border-color: rgba(255, 255, 255, 0.8);
+  background: linear-gradient(105deg, var(--brand-violet), #7c3aed 54%, #0891b2);
+}
+
+.neo-button.secondary {
+  border-color: var(--surface-border);
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.visual-frame {
+  border-color: rgba(103, 232, 249, 0.24);
+  border-radius: 16px;
+  background: linear-gradient(145deg, rgba(139, 92, 246, 0.14), rgba(17, 17, 22, 0.62) 48%, rgba(103, 232, 249, 0.08));
+}
+
+.visual-card {
+  border-color: rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  padding-inline: 0.9rem;
+}
+
+.section-kicker {
+  color: var(--brand-cyan);
+  letter-spacing: 0.24em;
+}
+
+.purpose-panel,
+.task-panel,
+.submission-form,
+.flow-card,
+.proof-card,
+.builder-card,
+.metric-card {
+  border-radius: 12px;
+}
+
+.purpose-panel {
+  border-color: rgba(139, 92, 246, 0.28);
+  background: linear-gradient(145deg, rgba(24, 20, 38, 0.94), rgba(13, 13, 19, 0.9));
+}
+
+.flow-card,
+.proof-card,
+.builder-card {
+  border-color: var(--surface-border);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.06), rgba(17, 17, 22, 0.82));
+}
+
+.flow-card:hover,
+.proof-card:hover,
+.builder-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(103, 232, 249, 0.48);
+}
+
+.accepted-pill {
+  border-radius: 999px;
+  color: var(--brand-lime);
+}
+
+.sticky-pilot {
+  border-color: rgba(103, 232, 249, 0.28);
+  background: rgba(13, 13, 19, 0.94);
+}
+
+.mobile-menu-button {
+  display: none;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--fg);
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  cursor: pointer;
+}
+
+.mobile-nav {
+  display: none;
+}
+
+@media (max-width: 1100px) {
+  .site-header {
+    grid-template-columns: auto 1fr auto;
+  }
+
+  .mobile-menu-button {
+    display: grid;
+  }
+
+  .mobile-nav {
+    position: sticky;
+    top: 74px;
+    z-index: 39;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--line);
+    background: rgba(9, 9, 11, 0.96);
+    backdrop-filter: blur(18px);
+  }
+
+  .mobile-nav a {
+    padding: 0.55rem 0.7rem;
+    color: #d7d5dc;
+    text-decoration: none;
+    font-size: 0.78rem;
+    font-weight: 850;
+  }
+
+  .mobile-nav a:hover,
+  .mobile-nav a:focus-visible {
+    color: var(--aqua);
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-latest {
+    min-height: auto;
+    padding-top: 3.5rem;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(3rem, 15vw, 4.8rem);
+  }
+
+  .hero-actions {
+    width: 100%;
+  }
+
+  .hero-actions .neo-button {
+    flex: 1 1 100%;
+  }
+
+  .sticky-pilot {
+    width: calc(100vw - 1rem);
+    padding: 0.7rem;
+  }
+
+  .sticky-pilot strong {
+    font-size: 0.76rem;
+  }
+}

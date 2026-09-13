@@ -1,0 +1,14 @@
+{
+  "name": "alpha-builders-qa",
+  "private": true,
+  "engines": { "node": "22.16.x" },
+  "scripts": {
+    "test": "playwright test alpha-builders.e2e.spec.mjs --workers=1 --reporter=line",
+    "lighthouse": "lhci autorun --config=../web/lighthouserc.json"
+  },
+  "devDependencies": {
+    "@lhci/cli": "0.15.1",
+    "@playwright/test": "1.55.0",
+    "axe-core": "4.10.3"
+  }
+}

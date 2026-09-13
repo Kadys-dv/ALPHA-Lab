@@ -1,0 +1,9 @@
+{
+  "githubHost": "github.com",
+  "cycleIdPattern": "^alpha-[0-9a-f]{12}$",
+  "walletPattern": "^0x[a-fA-F0-9]{40}$",
+  "noncePattern": "^0x[a-fA-F0-9]{64}$",
+  "signaturePattern": "^0x[a-fA-F0-9]{130}$",
+  "proofMessagePrefix": "ALPHA Builders wallet proof",
+  "issueTitle": "[ALPHA Builders] README review submission"
+}

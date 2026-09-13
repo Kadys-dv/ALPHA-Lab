@@ -16,8 +16,11 @@ describe("GET /api/status", () => {
       source: { healthySources: 5, totalSources: 5 },
       metrics: { submitted: 0, completionRate: null, willingnessToPay: null },
       targets: { participants: 10, submissions: 7, reviewSlaHours: 48 },
+      freshness: { maxAgeSeconds: 900, isFresh: true },
     });
     expect(Date.parse(payload.checkedAt)).not.toBeNaN();
+    expect(payload.requestId).toMatch(/^[0-9a-f-]{36}$/);
+    expect(response.headers.get("X-Request-Id")).toBe(payload.requestId);
   });
 
   it("returns partial data when one GitHub source is rate limited", async () => {
@@ -32,5 +35,15 @@ describe("GET /api/status", () => {
     expect(payload.state).toBe("partial");
     expect(payload.source.healthySources).toBe(4);
     expect(payload.metrics.submitted).toBeNull();
+    expect(payload.freshness).toMatchObject({ isFresh: false, source: "degraded" });
+  });
+
+  it("does not expose a snapshot as fresh when the current source is degraded", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("{}", { status: 429 })));
+    const response = await GET();
+    const payload = await response.json();
+    expect(payload.state).toBe("unavailable");
+    expect(payload.freshness.isFresh).toBe(false);
+    if (payload.snapshot) expect(payload.snapshot.freshness).toHaveProperty("isFresh");
   });
 });

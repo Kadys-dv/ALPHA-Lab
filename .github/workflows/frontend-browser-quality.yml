@@ -7,8 +7,11 @@ on:
     paths:
       - 'web/**'
       - 'qa/**'
+      - 'qa/package-lock.json'
       - '.github/workflows/frontend-browser-quality.yml'
   workflow_dispatch:
+  schedule:
+    - cron: '43 9 * * *'
 
 permissions:
   contents: read
@@ -24,21 +27,24 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Setup Node
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version: '22.16.0'
           cache: npm
-          cache-dependency-path: web/package-lock.json
+          cache-dependency-path: |
+            web/package-lock.json
+            qa/package-lock.json
 
       - name: Install canonical frontend
         working-directory: web
         run: npm ci --no-audit --no-fund
 
       - name: Install pinned browser QA tools
-        run: npm install --no-save --package-lock=false --ignore-scripts @playwright/test@1.55.0 axe-core@4.10.3 @lhci/cli@0.15.1
+        working-directory: qa
+        run: npm ci --no-audit --no-fund
 
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
@@ -64,10 +70,12 @@ jobs:
           exit 1
 
       - name: Playwright and Axe
-        run: npx playwright test qa/alpha-builders.e2e.spec.mjs --workers=1 --reporter=line
+        working-directory: qa
+        run: npm test
 
       - name: Lighthouse budgets
-        run: npx lhci autorun --config=web/lighthouserc.json
+        working-directory: qa
+        run: npm run lighthouse
 
       - name: Show server log on failure
         if: failure()

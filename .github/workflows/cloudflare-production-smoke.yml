@@ -12,9 +12,14 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: alpha-production-smoke
+  cancel-in-progress: true
+
 jobs:
   smoke:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     env:
       PRODUCTION_URL: https://alpha-builders-web.cskadys.workers.dev
     steps:
@@ -32,11 +37,19 @@ jobs:
 
           curl --fail --silent --show-error --retry 8 --retry-delay 2 --retry-all-errors "$PRODUCTION_URL/api/version" > /tmp/version.json
           curl --fail --silent --show-error --retry 8 --retry-delay 2 --retry-all-errors "$PRODUCTION_URL/api/status" > /tmp/status.json
+          curl --fail --silent --show-error --retry 8 --retry-delay 2 --retry-all-errors "$PRODUCTION_URL/api/wallet-proof" > /tmp/wallet-proof.json
+          curl --silent --show-error --retry 8 --retry-delay 2 --retry-all-errors \
+            -X POST -H 'content-type: application/json' -d '{}' \
+            -D /tmp/wallet-proof-invalid.headers -o /tmp/wallet-proof-invalid.json \
+            "$PRODUCTION_URL/api/wallet-proof"
 
           node <<'NODE'
           const fs = require('fs');
           const version = JSON.parse(fs.readFileSync('/tmp/version.json', 'utf8'));
           const status = JSON.parse(fs.readFileSync('/tmp/status.json', 'utf8'));
+          const proof = JSON.parse(fs.readFileSync('/tmp/wallet-proof.json', 'utf8'));
+          const invalidProof = JSON.parse(fs.readFileSync('/tmp/wallet-proof-invalid.json', 'utf8'));
+          const invalidHeaders = fs.readFileSync('/tmp/wallet-proof-invalid.headers', 'utf8');
           const expectedContract = '0xff15343accc4b77479ebe3c4cae32d99d4c60f48';
           if (Number(version.chainId) !== 84532) throw new Error(`Unexpected chainId: ${version.chainId}`);
           if (String(version.contract || '').toLowerCase() !== expectedContract) throw new Error(`Unexpected contract: ${version.contract}`);
@@ -45,6 +58,10 @@ jobs:
           if (!status.metrics || typeof status.metrics !== 'object') throw new Error('Missing status.metrics');
           if (!['ok', 'partial', 'unavailable'].includes(status.state)) throw new Error(`Invalid status.state: ${status.state}`);
           if (!status.checkedAt || Number.isNaN(Date.parse(status.checkedAt))) throw new Error('Missing status.checkedAt');
+          if (!/^0x[a-f0-9]{64}$/.test(proof.nonce || '')) throw new Error('Invalid wallet proof nonce');
+          if (!proof.requestId || !proof.createdAt || !proof.expiresAt) throw new Error('Incomplete wallet proof challenge');
+          if (invalidProof.error !== 'invalid_payload') throw new Error(`Unexpected invalid proof response: ${invalidProof.error}`);
+          if (!/^x-request-id:/im.test(invalidHeaders)) throw new Error('Invalid proof response missing X-Request-Id');
           console.log(`Production URL: ${process.env.PRODUCTION_URL}`);
           console.log(`Deployment commit: ${version.commit}`);
           console.log(`Chain ID: ${version.chainId}`);
