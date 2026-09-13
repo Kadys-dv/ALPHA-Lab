@@ -43,3 +43,5 @@ D1 com consumo transacional), além de verificar replay sob concorrência.
 O endpoint `/api/wallet-proof` valida a assinatura antes de consumir o nonce e serializa tentativas do mesmo nonce dentro de cada isolate. Isso impede que uma assinatura inválida consuma o desafio legítimo no mesmo processo.
 
 Proteção atômica entre múltiplos isolates ainda depende de um mecanismo com compare-and-set ou transação, como Durable Objects ou D1. O binding KV opcional não deve ser tratado como prova de atomicidade entre requests concorrentes até que essa integração seja provisionada e validada em staging.
+
+O endpoint também aplica um limite local de 20 POSTs por minuto por endereço quando o runtime fornece `CF-Connecting-IP` ou `X-Forwarded-For`, além de rejeitar payloads acima de 16 KiB. Esse limite é uma defesa adicional por isolate, não substitui rate limiting distribuído na borda Cloudflare.

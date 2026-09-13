@@ -5,15 +5,21 @@ import { buildWalletProofMessage, isEvmAddress, normalizeGitHubEvidenceUrl } fro
 import contract from "@/lib/submission-contract.json";
 
 const NONCE_TTL_MS = 5 * 60 * 1000;
+const RATE_WINDOW_MS = 60 * 1000;
+const RATE_LIMIT = 20;
+const MAX_PAYLOAD_BYTES = 16 * 1024;
 type NonceRecord = { createdAt: string; expiresAt: number };
+type RateRecord = { count: number; resetAt: number };
 type KvBinding = { get(key: string, type?: "json"): Promise<NonceRecord | null>; put(key: string, value: string, options?: { expirationTtl?: number }): Promise<void>; delete(key: string): Promise<void> };
 const nonces = new Map<string, NonceRecord>();
 const nonceLocks = new Map<string, Promise<void>>();
+const rateLimits = new Map<string, RateRecord>();
 const binding = (globalThis as unknown as { ALPHA_NONCES?: KvBinding }).ALPHA_NONCES;
 
 async function prune() {
   const now = Date.now();
   for (const [nonce, value] of nonces) if (value.expiresAt <= now) nonces.delete(nonce);
+  for (const [key, value] of rateLimits) if (value.resetAt <= now) rateLimits.delete(key);
 }
 
 function requestId(): string {
@@ -22,6 +28,30 @@ function requestId(): string {
 
 function errorResponse(error: string, status = 400, id = requestId()) {
   return NextResponse.json({ ok: false, error, requestId: id }, { status, headers: { "X-Request-Id": id, "Cache-Control": "no-store" } });
+}
+
+function clientAddress(request: Request): string | null {
+  const forwarded = request.headers.get("CF-Connecting-IP") ?? request.headers.get("X-Forwarded-For")?.split(",")[0];
+  const value = forwarded?.trim();
+  return value ? value : null;
+}
+
+function checkRateLimit(request: Request): Response | null {
+  const address = clientAddress(request);
+  if (!address) return null;
+  const now = Date.now();
+  const current = rateLimits.get(address);
+  const record = !current || current.resetAt <= now
+    ? { count: 1, resetAt: now + RATE_WINDOW_MS }
+    : { count: current.count + 1, resetAt: current.resetAt };
+  rateLimits.set(address, record);
+  if (record.count <= RATE_LIMIT) return null;
+  const retryAfter = Math.max(1, Math.ceil((record.resetAt - now) / 1000));
+  const id = request.headers.get("X-Request-Id") ?? requestId();
+  return NextResponse.json(
+    { ok: false, error: "rate_limited", requestId: id },
+    { status: 429, headers: { "X-Request-Id": id, "Cache-Control": "no-store", "Retry-After": String(retryAfter) } },
+  );
 }
 
 async function withNonceLock<T>(nonce: string, operation: () => Promise<T>): Promise<T> {
@@ -55,6 +85,10 @@ export async function GET() {
 
 export async function POST(request: Request) {
   await prune();
+  const limited = checkRateLimit(request);
+  if (limited) return limited;
+  const contentLength = Number(request.headers.get("content-length") ?? 0);
+  if (contentLength > MAX_PAYLOAD_BYTES) return errorResponse("payload_too_large", 413);
   const id = request.headers.get("X-Request-Id") ?? requestId();
   let input: unknown;
   try { input = await request.json(); } catch { return errorResponse("invalid_json", 400, id); }

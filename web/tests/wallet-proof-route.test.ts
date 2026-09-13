@@ -63,4 +63,18 @@ describe("wallet proof route", () => {
     }));
     expect(valid.status).toBe(200);
   });
+
+  it("limits identified clients after repeated proof attempts", async () => {
+    const headers = { "content-type": "application/json", "CF-Connecting-IP": "198.51.100.20" };
+    let response: Response | undefined;
+    for (let attempt = 0; attempt < 21; attempt += 1) {
+      response = await POST(new Request("http://localhost/api/wallet-proof", {
+        method: "POST",
+        body: JSON.stringify({}),
+        headers,
+      }));
+    }
+    expect(response?.status).toBe(429);
+    expect(response?.headers.get("Retry-After")).toMatch(/^\d+$/);
+  });
 });
