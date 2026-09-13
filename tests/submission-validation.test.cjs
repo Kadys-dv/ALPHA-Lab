@@ -8,9 +8,11 @@ function harness({ issueBody = body("https://github.com/acme/demo/pull/7"), labe
   const calls = { labels: [], comments: [], updates: [] };
   const rubric = `<!-- alpha-review -->\nContexto e objetivo: aprovado\nInstalação reproduzível: aprovado\nDecisões técnicas: aprovado\nTestes e validações: aprovado\nDemonstração: não se aplica\nResultado: aprovado\nRecomendação: Explicar melhor as decisões de arquitetura.`;
   const github = {
-    paginate: async (method) => method === github.rest.issues.listComments
-      ? [{ body: rubric, author_association: "OWNER", user: { login: "reviewer" } }]
-      : files,
+    paginate: async (method) => {
+      if (method === github.rest.issues.listComments) return [{ body: rubric, author_association: "OWNER", user: { login: "reviewer" } }];
+      if (method === github.rest.issues.listForRepo) return [];
+      return files;
+    },
     rest: {
       issues: {
         getLabel: async () => ({}), createLabel: async () => ({}),
@@ -18,6 +20,7 @@ function harness({ issueBody = body("https://github.com/acme/demo/pull/7"), labe
         createComment: async (input) => calls.comments.push(input.body),
         update: async (input) => calls.updates.push(input),
         listComments: async () => ({}),
+        listForRepo: async () => ({}),
       },
       repos: { get: async () => ({ data: { private: false } }), getReadme: async () => ({}) },
       pulls: {
@@ -47,6 +50,15 @@ describe("submission workflow", () => {
     assert.deepEqual(h.calls.labels.at(-1), ["submission", "needs-review"]);
   });
 
+  it("rejects a nonce already used by another submission", async () => {
+    const h = harness();
+    h.github.paginate = async (method) => method === h.github.rest.issues.listForRepo
+      ? [{ number: 99, body: body("https://github.com/acme/demo/pull/8") }]
+      : [{ filename: "README.md" }];
+    await validateSubmission(h);
+    assert.deepEqual(h.calls.labels.at(-1), ["submission", "needs-review"]);
+  });
+
   it("sends a pull request without README changes to manual review", async () => {
     const h = harness({ files: [{ filename: "src/index.js" }] });
     await validateSubmission(h);
@@ -59,6 +71,7 @@ describe("submission workflow", () => {
     assert.deepEqual(h.calls.labels.at(-1), ["submission", "valid", "accepted"]);
     assert.match(h.calls.updates[0].body, /alpha-accepted-at:/);
     assert.match(h.calls.updates[0].body, /alpha-review-record/);
+    assert.match(h.calls.comments.at(-1), /formulário de feedback associado/i);
   });
 
   it("does not invent an acceptance time when a legacy issue is edited", async () => {

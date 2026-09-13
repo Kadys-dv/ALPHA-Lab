@@ -27,13 +27,20 @@ describe("public status", () => {
   it("separates completion, acceptance and feedback metrics", () => {
     const submitted = source([{ number: 1, user: { login: "one" } }, { number: 2, user: { login: "two" } }]);
     const started = source([{ number: 10, user: { login: "one" } }, { number: 11, user: { login: "two" } }, { number: 12, user: { login: "three" } }, { number: 13, user: { login: "four" } }]);
-    const feedback = source([{ number: 20, body: "### A revisão foi útil?\n\nsim\n\n### Você aplicou a recomendação principal?\n\nsim\n\n### Você faria outro ciclo nas próximas quatro semanas?\n\ntalvez\n\n### Você pagaria por uma revisão individual?\n\nsim" }]);
-    const result = buildPublicStatus(submitted, source([]), source([]), started, feedback);
+    const accepted = source([{ number: 1, labels: [{ name: "submission" }] }]);
+    const feedbackBody = "### Submission\n\n1\n\n### A revisão foi útil?\n\nsim\n\n### Você aplicou a recomendação principal?\n\nsim\n\n### Você faria outro ciclo nas próximas quatro semanas?\n\ntalvez\n\n### Você pagaria por uma revisão individual?\n\nsim";
+    const feedback = source([
+      { number: 20, body: feedbackBody, user: { login: "one" }, updated_at: "2026-09-02T00:00:00Z" },
+      { number: 21, body: feedbackBody, user: { login: "one" }, updated_at: "2026-09-01T00:00:00Z" },
+      { number: 22, body: feedbackBody.replace("### Submission\n\n1", "### Submission\n\n999"), user: { login: "two" } },
+    ]);
+    const result = buildPublicStatus(submitted, source([]), accepted, started, feedback);
     expect(result.metrics.completionRate).toBe(50);
-    expect(result.metrics.approvalRate).toBe(0);
+    expect(result.metrics.approvalRate).toBe(50);
     expect(result.metrics.dropoffs).toBe(2);
     expect(result.metrics.usefulRate).toBe(100);
     expect(result.metrics.willingnessToPay).toBe(1);
+    expect(result.metrics.feedbackCount).toBe(1);
   });
 
   it("does not invent a review duration for legacy acceptance", () => {

@@ -9,6 +9,8 @@ export type GitHubIssue = {
   number: number;
   body?: string | null;
   created_at?: string;
+  updated_at?: string;
+  title?: string;
   labels?: Array<string | { name?: string | null }>;
   user?: { login?: string | null };
   pull_request?: unknown;
@@ -97,7 +99,16 @@ export function buildPublicStatus(submitted: IssueSource, underReview: IssueSour
     } catch { /* Invalid legacy records do not become metrics. */ }
   }
   const feedbackValue = (body: string | null | undefined, label: string) => body?.match(new RegExp(`### ${label}\\s+\\n\\s*([^\\n]+)`, "i"))?.[1]?.trim().toLowerCase();
-  const feedbackItems = feedback.ok ? feedback.items : [];
+  const acceptedNumbers = new Set(acceptedIssues.map((issue) => issue.number));
+  const feedbackByParticipant = new Map<string, GitHubIssue>();
+  for (const issue of feedback.ok ? feedback.items.toSorted((a, b) => Date.parse(b.updated_at ?? "") - Date.parse(a.updated_at ?? "")) : []) {
+    const submissionNumber = Number(feedbackValue(issue.body, "Submission") ?? issue.title?.match(/#(\d+)/)?.[1]);
+    const participant = issue.user?.login?.toLowerCase();
+    if (!participant || !acceptedNumbers.has(submissionNumber)) continue;
+    const key = `${participant}:${submissionNumber}`;
+    if (!feedbackByParticipant.has(key)) feedbackByParticipant.set(key, issue);
+  }
+  const feedbackItems = [...feedbackByParticipant.values()];
   const countFeedback = (label: string, expected: string) => feedbackItems.filter((issue) => feedbackValue(issue.body, label) === expected).length;
   const participantIds = (source: IssueSource) => new Set(source.items.flatMap((issue) => issue.user?.login ? [issue.user.login.toLowerCase()] : []));
   const startedParticipants = started.ok ? participantIds(started) : null;

@@ -111,6 +111,7 @@ npm run build:vinext
 - [Produção](docs/PRODUCTION.md)
 - [Métricas](docs/METRICS.md)
 - [Execução do piloto](docs/PILOT.md)
+- [Recrutamento da coorte inicial](docs/OUTREACH.md)
 - [Rubrica de revisão](docs/REVIEW-RUBRIC.md)
 - [Hipótese de produto ALPHA Builders](docs/PRODUCT.md)
 - [Roadmap de validação](docs/ROADMAP.md)

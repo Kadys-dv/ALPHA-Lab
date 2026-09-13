@@ -6,6 +6,11 @@ import { usePublicStatus } from "@/hooks/usePublicStatus";
 
 const value = (metric: number | null, suffix = "") => metric === null ? "—" : `${metric}${suffix}`;
 const feedbackUrl = "https://github.com/Kadys-dv/ALPHA-Lab/issues/new?template=alpha-pilot-feedback.yml";
+const rubricLabels: Record<string, string> = { context: "Contexto", installation: "Instalação", decisions: "Decisões técnicas", tests: "Testes e validações", demo: "Demonstração" };
+
+function Goal({ label, current, target }: { label: string; current: number | null; target: number }) {
+  return <li className="pilot-goal"><span><Target size={16}/> {label}: {value(current)} / {target}</span><progress aria-label={`Progresso de ${label}`} max={target} value={current ?? 0}/></li>;
+}
 
 export default function OperationsPage() {
   const status = usePublicStatus();
@@ -25,14 +30,14 @@ export default function OperationsPage() {
       <article><small><Workflow size={14}/> APLICAÇÃO</small><strong>{value(status.metrics.appliedRate, "%")}</strong><span>aplicaram a recomendação principal</span></article>
       <article><small><Users size={14}/> REPETIÇÃO</small><strong>{value(status.metrics.repeatIntentRate, "%")}</strong><span>declararam intenção de repetir</span></article>
     </div>
-    <section className="builder-validation"><div><small>METAS 10 / 7 / 5 / 3</small><h2>Placar de decisão.</h2></div><ul>
-      <li><Target size={16}/> Participantes: {value(status.metrics.started)} / {targets?.participants ?? 10}</li>
-      <li><Target size={16}/> Submissões: {value(status.metrics.submitted)} / {targets?.submissions ?? 7}</li>
-      <li><Target size={16}/> Builders recorrentes: {value(status.metrics.repeatBuilders)} / {targets?.repeatBuilders ?? 5}</li>
-      <li><Target size={16}/> Disposição de pagar: {value(status.metrics.willingnessToPay)} / {targets?.willingnessToPay ?? 3}</li>
+    <section className="builder-validation"><div><small>METAS 10 / 7 / 5 / 3</small><h2>Placar de decisão.</h2></div><ul className="pilot-goals">
+      <Goal label="Participantes" current={status.metrics.started} target={targets?.participants ?? 10}/>
+      <Goal label="Submissões" current={status.metrics.submitted} target={targets?.submissions ?? 7}/>
+      <Goal label="Builders recorrentes" current={status.metrics.repeatBuilders} target={targets?.repeatBuilders ?? 5}/>
+      <Goal label="Disposição de pagar" current={status.metrics.willingnessToPay} target={targets?.willingnessToPay ?? 3}/>
     </ul></section>
     <section className="builder-validation"><div><small>RUBRICA</small><h2>Pontos que mais exigem ajustes.</h2><p>Contagens derivadas somente de revisões aceitas e registradas.</p></div><ul>
-      {gaps.length ? gaps.map(([criterion, count]) => <li key={criterion}>{criterion}: {count.adjustments} ajustes em {count.measured} avaliações</li>) : <li>Aguardando rubricas aceitas.</li>}
+      {gaps.length ? gaps.map(([criterion, count]) => <li key={criterion}>{rubricLabels[criterion] ?? criterion}: {count.adjustments} ajustes em {count.measured} avaliações</li>) : <li>Aguardando rubricas aceitas.</li>}
     </ul></section>
     <a className="neo-button primary" href={feedbackUrl} target="_blank" rel="noreferrer">Registrar feedback do ciclo</a>
   </div></main>;

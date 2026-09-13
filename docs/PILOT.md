@@ -8,6 +8,8 @@ O piloto valida o serviço antes de qualquer ampliação do token ou criação d
 
 ## Recrutamento
 
+Começar com a [coorte inicial de três participantes](OUTREACH.md) antes de ampliar para dez.
+
 - convidar desenvolvedores iniciantes com ao menos um repositório público incompleto;
 - buscar participantes em comunidades de estudo, bootcamps e contatos diretos;
 - explicar que ALPHA é testnet, não tem valor financeiro e não garante emprego;

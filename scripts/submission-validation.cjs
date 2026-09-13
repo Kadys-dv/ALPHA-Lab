@@ -102,6 +102,9 @@ async function markAccepted({ github, context, issue, recordAcceptance, review }
   const reviewRecord = `<!-- alpha-review-record\n${JSON.stringify(review)}\n-->`;
   const body = `${issue.body ?? ""}\n\n<!-- alpha-accepted-at: ${acceptedAt} -->\n${reviewRecord}`.trim();
   await github.rest.issues.update({ ...context.repo, issue_number: issue.number, body });
+  const feedbackTitle = encodeURIComponent(`[ALPHA Feedback] Review #${issue.number}`);
+  const feedbackUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/issues/new?template=alpha-pilot-feedback.yml&title=${feedbackTitle}`;
+  await github.rest.issues.createComment({ ...context.repo, issue_number: issue.number, body: `Contribuição aceita. Registre o resultado do ciclo no [formulário de feedback associado à Issue #${issue.number}](${feedbackUrl}).` });
 }
 
 async function validateSubmission({ github, context, core, verifyWalletProof }) {
@@ -149,6 +152,9 @@ async function validateSubmission({ github, context, core, verifyWalletProof }) 
     });
     const ownsWallet = await verifier({ address: submission.wallet, message, signature: submission.signature });
     if (!ownsWallet) throw new Error("Invalid wallet signature");
+    const submissions = await github.paginate(github.rest.issues.listForRepo, { ...context.repo, state: "all", labels: "submission", per_page: 100 });
+    const nonceAlreadyUsed = submissions.some((candidate) => candidate.number !== issue.number && parseSubmission(candidate.body ?? "")?.nonce.toLowerCase() === submission.nonce.toLowerCase());
+    if (nonceAlreadyUsed) throw new Error("Nonce already used by another submission");
 
     const repository = await github.rest.repos.get({ owner, repo });
     if (repository.data.private) throw new Error("Repository is private");
