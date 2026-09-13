@@ -10,6 +10,8 @@ on:
       - 'qa/package-lock.json'
       - '.github/workflows/frontend-browser-quality.yml'
   workflow_dispatch:
+  schedule:
+    - cron: '43 9 * * *'
 
 permissions:
   contents: read

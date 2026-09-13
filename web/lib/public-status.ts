@@ -177,6 +177,11 @@ export function buildPublicStatus(submitted: IssueSource, underReview: IssueSour
     rubric: rubricCounts,
     rubricVersion: 1,
     targets: { participants: 10, submissions: 7, repeatBuilders: 5, willingnessToPay: 3, reviewSlaHours: REVIEW_SLA_HOURS },
+    collections: {
+      builders: { visible: builders.length, total: parsedAccepted.length, limit: 12 },
+      startedCohort: { visible: startedCohort.length, total: started.ok ? started.items.length : null, limit: 10 },
+      reviewQueue: { visible: reviewQueue.length, total: reviewIssues.length, limit: 10 },
+    },
     startedCohort,
     reviewQueue,
     builders,

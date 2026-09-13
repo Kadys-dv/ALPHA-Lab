@@ -67,6 +67,7 @@ Site atual: https://alpha-builders-web.cskadys.workers.dev
 - [x] distinguir resposta atual degradada de fonte GitHub fresca no endpoint de status
 - [x] exibir estado degradado e idade do snapshot na tela de operações
 - [x] limitar abuso local do endpoint de prova e rejeitar payloads excessivos
+- [x] declarar limites das listas públicas de builders, coorte e fila
 
 ## Fase 6 — pipeline de contribuições: implementada tecnicamente
 

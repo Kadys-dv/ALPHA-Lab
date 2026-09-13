@@ -44,6 +44,11 @@ describe("public status", () => {
     expect(result.metrics.privateFeedbackRequests).toBe(1);
     expect(result.startedCohort[0]).toMatchObject({ issue: 10, author: "one", repository: "https://github.com/acme/demo" });
     expect(result.rubricVersion).toBe(1);
+    expect(result.collections).toMatchObject({
+      builders: { visible: 0, total: 0, limit: 12 },
+      startedCohort: { visible: 4, total: 4, limit: 10 },
+      reviewQueue: { visible: 0, total: 0, limit: 10 },
+    });
   });
 
   it("exposes an SLA queue for under-review submissions", () => {

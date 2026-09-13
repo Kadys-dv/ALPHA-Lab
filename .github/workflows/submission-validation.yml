@@ -10,7 +10,7 @@ permissions:
   pull-requests: read
 
 concurrency:
-  group: alpha-submission-${{ github.event.issue.number || github.run_id }}
+  group: alpha-issue-${{ github.event.issue.number || github.run_id }}
   cancel-in-progress: true
 
 jobs:
