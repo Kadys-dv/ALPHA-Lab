@@ -2,15 +2,16 @@ const { describe, it } = require("node:test");
 const assert = require("node:assert/strict");
 const { parseReview, parseSubmission, validateSubmission } = require("../scripts/submission-validation.cjs");
 
-const body = (evidence) => `Repository: https://github.com/acme/demo\nEvidence: ${evidence}\nWallet: 0x1111111111111111111111111111111111111111\nNonce: 0x${"2".repeat(64)}\nSignature: 0x${"3".repeat(130)}`;
+const body = (evidence, proofCreatedAt = new Date().toISOString()) => `Cycle ID: alpha-abcdef123456\nRepository: https://github.com/acme/demo\nEvidence: ${evidence}\nWallet: 0x1111111111111111111111111111111111111111\nNonce: 0x${"2".repeat(64)}\nProof Created At: ${proofCreatedAt}\nSignature: 0x${"3".repeat(130)}`;
 
-function harness({ issueBody = body("https://github.com/acme/demo/pull/7"), labels = [], files = [{ filename: "README.md" }] } = {}) {
+function harness({ issueBody = body("https://github.com/acme/demo/pull/7"), labels = [], files = [{ filename: "README.md" }], issueUser = "builder", pullUser = "builder", commitUser = "builder" } = {}) {
   const calls = { labels: [], comments: [], updates: [] };
   const rubric = `<!-- alpha-review -->\nContexto e objetivo: aprovado\nInstalação reproduzível: aprovado\nDecisões técnicas: aprovado\nTestes e validações: aprovado\nDemonstração: não se aplica\nResultado: aprovado\nRecomendação: Explicar melhor as decisões de arquitetura.`;
   const github = {
     paginate: async (method) => {
       if (method === github.rest.issues.listComments) return [{ body: rubric, author_association: "OWNER", user: { login: "reviewer" } }];
       if (method === github.rest.issues.listForRepo) return [];
+      if (method === github.rest.pulls.listCommits) return [{ author: { login: commitUser } }];
       return files;
     },
     rest: {
@@ -24,12 +25,13 @@ function harness({ issueBody = body("https://github.com/acme/demo/pull/7"), labe
       },
       repos: { get: async () => ({ data: { private: false } }), getReadme: async () => ({}) },
       pulls: {
-        get: async () => ({ data: { base: { repo: { full_name: "acme/demo" } } } }),
+        get: async () => ({ data: { user: { login: pullUser }, base: { repo: { full_name: "acme/demo" } } } }),
         listFiles: async () => ({}),
+        listCommits: async () => ({}),
       },
     },
   };
-  return { github, calls, context: { repo: { owner: "Kadys-dv", repo: "ALPHA-Lab" }, payload: { action: "labeled", label: { name: "accepted" }, issue: { number: 1, body: issueBody, labels } } }, core: { info() {}, warning() {} }, verifyWalletProof: async () => true };
+  return { github, calls, context: { repo: { owner: "Kadys-dv", repo: "ALPHA-Lab" }, payload: { action: "labeled", label: { name: "accepted" }, issue: { number: 1, body: issueBody, labels, user: { login: issueUser } } } }, core: { info() {}, warning() {} }, verifyWalletProof: async () => true };
 }
 
 describe("submission workflow", () => {
@@ -59,6 +61,24 @@ describe("submission workflow", () => {
     assert.deepEqual(h.calls.labels.at(-1), ["submission", "needs-review"]);
   });
 
+  it("rejects an expired wallet proof", async () => {
+    const h = harness({ issueBody: body("https://github.com/acme/demo/pull/7", "2026-01-01T00:00:00.000Z") });
+    await validateSubmission(h);
+    assert.deepEqual(h.calls.labels.at(-1), ["submission", "needs-review"]);
+  });
+
+  it("rejects a pull request not authored by the issue participant", async () => {
+    const h = harness({ issueUser: "builder", pullUser: "other", commitUser: "other" });
+    await validateSubmission(h);
+    assert.deepEqual(h.calls.labels.at(-1), ["submission", "needs-review"]);
+  });
+
+  it("accepts pull requests with commits authored by the issue participant", async () => {
+    const h = harness({ issueUser: "builder", pullUser: "other", commitUser: "builder" });
+    await validateSubmission(h);
+    assert.deepEqual(h.calls.labels.at(-1), ["submission", "valid", "under-review"]);
+  });
+
   it("sends a pull request without README changes to manual review", async () => {
     const h = harness({ files: [{ filename: "src/index.js" }] });
     await validateSubmission(h);
@@ -71,6 +91,7 @@ describe("submission workflow", () => {
     assert.deepEqual(h.calls.labels.at(-1), ["submission", "valid", "accepted"]);
     assert.match(h.calls.updates[0].body, /alpha-accepted-at:/);
     assert.match(h.calls.updates[0].body, /alpha-review-record/);
+    assert.match(h.calls.updates[0].body, /"version":1/);
     assert.match(h.calls.comments.at(-1), /formulário de feedback associado/i);
   });
 

@@ -4,11 +4,27 @@ title: "[ALPHA Feedback] Review"
 labels: [pilot-feedback]
 body:
   - type: input
+    id: cycle
+    attributes:
+      label: Cycle ID
+      description: Mesmo identificador usado no inicio/submissao, se existir.
+      placeholder: alpha-abcdef123456
+    validations:
+      required: false
+  - type: input
     id: submission
     attributes:
       label: Submission
       description: Número da Issue de submissão revisada.
       placeholder: "123"
+    validations:
+      required: true
+  - type: dropdown
+    id: privacy
+    attributes:
+      label: Preferencia de feedback
+      description: Conteudos privados nao devem ser publicados na Issue; use esta escolha para sinalizar follow-up fora do GitHub publico.
+      options: [publico, privado]
     validations:
       required: true
   - type: dropdown

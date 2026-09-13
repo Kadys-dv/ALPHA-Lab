@@ -2,7 +2,9 @@ export type Submission = {
   repoUrl: string;
   evidenceUrl: string;
   wallet: string;
+  cycleId?: string;
   nonce?: string;
+  proofCreatedAt?: string;
   signature?: string;
 };
 
@@ -10,11 +12,14 @@ type SubmissionInput = {
   repoUrl?: string;
   evidenceUrl?: string;
   wallet: string;
+  cycleId: string;
   nonce: string;
+  proofCreatedAt: string;
   signature: string;
 };
 
 const SEGMENT = /^[A-Za-z0-9_.-]+$/;
+const CYCLE_ID = /^alpha-[0-9a-f]{12}$/;
 
 export function normalizeGitHubEvidenceUrl(input: string): string | null {
   try {
@@ -50,25 +55,35 @@ export function isEvmAddress(input: string): boolean {
   return /^0x[a-fA-F0-9]{40}$/.test(input.trim());
 }
 
-export function buildWalletProofMessage(evidenceUrl: string, wallet: string, nonce: string): string {
-  const evidence = normalizeGitHubEvidenceUrl(evidenceUrl);
-  if (!evidence || !isEvmAddress(wallet) || !/^0x[a-fA-F0-9]{64}$/.test(nonce)) throw new Error("Invalid wallet proof");
-  return `ALPHA Builders wallet proof\nEvidence: ${evidence}\nWallet: ${wallet.toLowerCase()}\nNonce: ${nonce}`;
+export function buildCycleId(bytes: Uint8Array): string {
+  return `alpha-${Array.from(bytes.slice(0, 6), (byte) => byte.toString(16).padStart(2, "0")).join("")}`;
 }
 
-export function buildIssueUrl({ repoUrl, evidenceUrl, wallet, nonce, signature }: SubmissionInput): string {
+export function isCycleId(input: string): boolean {
+  return CYCLE_ID.test(input.trim());
+}
+
+export function buildWalletProofMessage(evidenceUrl: string, wallet: string, nonce: string, proofCreatedAt: string): string {
+  const evidence = normalizeGitHubEvidenceUrl(evidenceUrl);
+  if (!evidence || !isEvmAddress(wallet) || !/^0x[a-fA-F0-9]{64}$/.test(nonce) || Number.isNaN(Date.parse(proofCreatedAt))) throw new Error("Invalid wallet proof");
+  return `ALPHA Builders wallet proof\nEvidence: ${evidence}\nWallet: ${wallet.toLowerCase()}\nNonce: ${nonce}\nCreated At: ${proofCreatedAt}`;
+}
+
+export function buildIssueUrl({ repoUrl, evidenceUrl, wallet, cycleId, nonce, proofCreatedAt, signature }: SubmissionInput): string {
   const safeEvidence = normalizeGitHubEvidenceUrl(evidenceUrl ?? repoUrl ?? "");
   const safeRepo = safeEvidence ? normalizeGitHubRepoUrl(safeEvidence) : null;
-  if (!safeRepo || !safeEvidence || !isEvmAddress(wallet) || !/^0x[a-fA-F0-9]{64}$/.test(nonce) || !/^0x[a-fA-F0-9]{130}$/.test(signature)) throw new Error("Invalid submission");
+  if (!safeRepo || !safeEvidence || !isEvmAddress(wallet) || !isCycleId(cycleId) || !/^0x[a-fA-F0-9]{64}$/.test(nonce) || Number.isNaN(Date.parse(proofCreatedAt)) || !/^0x[a-fA-F0-9]{130}$/.test(signature)) throw new Error("Invalid submission");
 
   const title = "[ALPHA Builders] README review submission";
   const body = [
     "## ALPHA Builders submission",
     "",
+    `Cycle ID: ${cycleId}`,
     `Repository: ${safeRepo}`,
     `Evidence: ${safeEvidence}`,
     `Wallet: ${wallet.trim()}`,
     `Nonce: ${nonce}`,
+    `Proof Created At: ${proofCreatedAt}`,
     `Signature: ${signature}`,
     "",
     "Status: submitted",
@@ -87,7 +102,9 @@ export function parseSubmission(body: string): Submission | null {
   const wallet =
     body.match(/^Wallet:\s*(0x[a-fA-F0-9]{40})\s*$/im)?.[1] ??
     body.match(/### Wallet\s+\n\s*(0x[a-fA-F0-9]{40})/im)?.[1];
+  const cycleId = body.match(/^Cycle ID:\s*(alpha-[0-9a-f]{12})\s*$/im)?.[1] ?? body.match(/### Cycle ID\s+\n\s*(alpha-[0-9a-f]{12})/im)?.[1];
   const nonce = body.match(/^Nonce:\s*(0x[a-fA-F0-9]{64})\s*$/im)?.[1] ?? body.match(/### Nonce\s+\n\s*(0x[a-fA-F0-9]{64})/im)?.[1];
+  const proofCreatedAt = body.match(/^Proof Created At:\s*([^\n]+)\s*$/im)?.[1]?.trim() ?? body.match(/### Proof Created At\s+\n\s*([^\n]+)/im)?.[1]?.trim();
   const signature = body.match(/^Signature:\s*(0x[a-fA-F0-9]{130})\s*$/im)?.[1] ?? body.match(/### Signature\s+\n\s*(0x[a-fA-F0-9]{130})/im)?.[1];
 
   if (!repo || !wallet) return null;
@@ -97,5 +114,5 @@ export function parseSubmission(body: string): Submission | null {
   if (!normalizedRepo || !normalizedEvidence || !isEvmAddress(wallet)) return null;
   if (normalizeGitHubRepoUrl(normalizedEvidence) !== normalizedRepo) return null;
 
-  return { repoUrl: normalizedRepo, evidenceUrl: normalizedEvidence, wallet, nonce, signature };
+  return { repoUrl: normalizedRepo, evidenceUrl: normalizedEvidence, wallet, cycleId, nonce, proofCreatedAt, signature };
 }

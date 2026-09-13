@@ -9,6 +9,8 @@ const LABELS = {
 
 const ACCEPTED_MARKER = /<!-- alpha-accepted-at: ([^ ]+) -->/;
 const REVIEW_MARKER = "<!-- alpha-review -->";
+const RUBRIC_VERSION = 1;
+const PROOF_MAX_AGE_MS = 15 * 60 * 1000;
 const REVIEWERS = new Set(["OWNER", "MEMBER", "COLLABORATOR"]);
 const CRITERIA = [
   ["context", "Contexto e objetivo"],
@@ -29,7 +31,7 @@ function parseReview(comment) {
   const result = reviewField(comment.body, "Resultado")?.toLowerCase();
   const recommendation = reviewField(comment.body, "Recomendação");
   if (Object.values(criteria).some((value) => !RATINGS.has(value)) || !["aprovado", "ajustes necessários", "reprovado"].includes(result) || !recommendation) return null;
-  return { criteria, result, recommendation: recommendation.slice(0, 500), reviewer: comment.user?.login ?? "unknown" };
+  return { version: RUBRIC_VERSION, criteria, result, recommendation: recommendation.slice(0, 500), reviewer: comment.user?.login ?? "unknown" };
 }
 
 function field(body, name, pattern) {
@@ -41,7 +43,9 @@ function parseSubmission(body) {
   const repository = field(body, "Repository", "https:\\/\\/github\\.com\\/[^\\s/]+\\/[^\\s/]+");
   const evidence = field(body, "Evidence", "https:\\/\\/github\\.com\\/\\S+") ?? repository;
   const wallet = field(body, "Wallet", "0x[a-fA-F0-9]{40}");
+  const cycleId = field(body, "Cycle ID", "alpha-[0-9a-f]{12}");
   const nonce = field(body, "Nonce", "0x[a-fA-F0-9]{64}");
+  const proofCreatedAt = field(body, "Proof Created At", "[^\\n]+");
   const signature = field(body, "Signature", "0x[a-fA-F0-9]{130}");
   if (!repository || !evidence || !wallet || !nonce || !signature) return null;
 
@@ -61,7 +65,9 @@ function parseSubmission(body) {
       repo: repoParts[1].replace(/\.git$/, ""),
       evidenceParts,
       wallet,
+      cycleId,
       nonce,
+      proofCreatedAt,
       signature,
     };
   } catch {
@@ -93,6 +99,24 @@ async function ensureLabels(github, context) {
 async function findReview(github, context, issueNumber) {
   const comments = await github.paginate(github.rest.issues.listComments, { ...context.repo, issue_number: issueNumber, per_page: 100 });
   return comments.toReversed().map(parseReview).find(Boolean) ?? null;
+}
+
+function assertFreshProof(submission) {
+  if (!submission.proofCreatedAt) throw new Error("Missing proof creation timestamp");
+  const createdAt = Date.parse(submission.proofCreatedAt);
+  if (Number.isNaN(createdAt)) throw new Error("Invalid proof creation timestamp");
+  const age = Date.now() - createdAt;
+  if (age < -60_000 || age > PROOF_MAX_AGE_MS) throw new Error("Wallet proof expired");
+}
+
+async function assertPullRequestAuthorship(github, issue, owner, repo, pullNumber, pull) {
+  const issueAuthor = issue.user?.login?.toLowerCase();
+  if (!issueAuthor) throw new Error("Missing issue author");
+  const pullAuthor = pull.data.user?.login?.toLowerCase();
+  if (pullAuthor === issueAuthor) return;
+  const commits = await github.paginate(github.rest.pulls.listCommits, { owner, repo, pull_number: pullNumber, per_page: 100 });
+  const authoredCommit = commits.some((commit) => commit.author?.login?.toLowerCase() === issueAuthor);
+  if (!authoredCommit) throw new Error("Submission author is not linked to the pull request");
 }
 
 async function markAccepted({ github, context, issue, recordAcceptance, review }) {
@@ -145,7 +169,8 @@ async function validateSubmission({ github, context, core, verifyWalletProof }) 
   try {
     const canonicalRepo = `https://github.com/${owner}/${repo}`;
     const canonicalEvidence = evidenceParts.length === 4 ? `${canonicalRepo}/pull/${evidenceParts[3]}` : canonicalRepo;
-    const message = `ALPHA Builders wallet proof\nEvidence: ${canonicalEvidence}\nWallet: ${submission.wallet.toLowerCase()}\nNonce: ${submission.nonce}`;
+    assertFreshProof(submission);
+    const message = `ALPHA Builders wallet proof\nEvidence: ${canonicalEvidence}\nWallet: ${submission.wallet.toLowerCase()}\nNonce: ${submission.nonce}\nCreated At: ${submission.proofCreatedAt}`;
     const verifier = verifyWalletProof ?? (async (input) => {
       const { verifyMessage } = await import("viem");
       return verifyMessage(input);
@@ -173,6 +198,7 @@ async function validateSubmission({ github, context, core, verifyWalletProof }) 
       if (pull.data.base.repo.full_name.toLowerCase() !== `${owner}/${repo}`.toLowerCase()) {
         throw new Error("Pull request targets another repository");
       }
+      await assertPullRequestAuthorship(github, issue, owner, repo, pullNumber, pull);
       const files = await github.paginate(github.rest.pulls.listFiles, { owner, repo, pull_number: pullNumber, per_page: 100 });
       if (!files.some((file) => /(^|\/)readme(?:\.[^/]+)?$/i.test(file.filename))) {
         await setState(github, context, issue.number, "needsReview");
@@ -190,4 +216,4 @@ async function validateSubmission({ github, context, core, verifyWalletProof }) 
   }
 }
 
-module.exports = { ACCEPTED_MARKER, parseReview, parseSubmission, validateSubmission };
+module.exports = { ACCEPTED_MARKER, PROOF_MAX_AGE_MS, parseReview, parseSubmission, validateSubmission };

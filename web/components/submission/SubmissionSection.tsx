@@ -2,7 +2,7 @@
 
 import { ArrowUpRight, Wallet } from "lucide-react";
 import { FormEvent, useState } from "react";
-import { buildIssueUrl, buildWalletProofMessage, isEvmAddress, normalizeGitHubEvidenceUrl } from "@/lib/validation";
+import { buildCycleId, buildIssueUrl, buildWalletProofMessage, isEvmAddress, normalizeGitHubEvidenceUrl } from "@/lib/validation";
 
 type Props = {
   account: string;
@@ -61,8 +61,10 @@ export default function SubmissionSection({
       setFormState("signing");
       const bytes = crypto.getRandomValues(new Uint8Array(32));
       const nonce = `0x${Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("")}`;
-      const signature = await signMessage(buildWalletProofMessage(evidenceUrl, submissionWallet, nonce));
-      window.open(buildIssueUrl({ evidenceUrl, wallet: submissionWallet, nonce, signature }), "_blank", "noopener,noreferrer");
+      const cycleId = buildCycleId(crypto.getRandomValues(new Uint8Array(8)));
+      const proofCreatedAt = new Date().toISOString();
+      const signature = await signMessage(buildWalletProofMessage(evidenceUrl, submissionWallet, nonce, proofCreatedAt));
+      window.open(buildIssueUrl({ evidenceUrl, wallet: submissionWallet, cycleId, nonce, proofCreatedAt, signature }), "_blank", "noopener,noreferrer");
       setFormState("ready");
     } catch {
       setFormState("idle");
