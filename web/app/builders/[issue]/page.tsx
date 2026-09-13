@@ -40,14 +40,21 @@ export default async function BuilderProfile({ params }: { params: Params }) {
   const builder = await getAcceptedBuilder(issue);
   if (!builder) notFound();
 
-  const acceptedDate = new Intl.DateTimeFormat("pt-BR", {
+  const acceptedDate = builder.acceptedAt ? new Intl.DateTimeFormat("pt-BR", {
     dateStyle: "long",
     timeZone: "UTC",
-  }).format(new Date(builder.updatedAt));
+  }).format(new Date(builder.acceptedAt)) : "Data de aceite não registrada";
   const submittedDate = new Intl.DateTimeFormat("pt-BR", {
     dateStyle: "long",
     timeZone: "UTC",
   }).format(new Date(builder.createdAt));
+  const reviewCriteria = builder.review ? [
+    ["Contexto e objetivo", builder.review.criteria.context],
+    ["Instalação reproduzível", builder.review.criteria.installation],
+    ["Decisões técnicas", builder.review.criteria.decisions],
+    ["Testes e validações", builder.review.criteria.tests],
+    ["Demonstração", builder.review.criteria.demo],
+  ] : [];
 
   return (
     <main className="builder-profile-page" id="main-content">
@@ -112,6 +119,21 @@ export default async function BuilderProfile({ params }: { params: Params }) {
             <li><Check size={16} /> Issue marcada como aceita após revisão humana</li>
           </ul>
         </section>
+
+        {builder.review && (
+          <section className="builder-validation" aria-labelledby="human-review-title">
+            <div>
+              <small>REVISÃO HUMANA / @{builder.review.reviewer}</small>
+              <h2 id="human-review-title">Rubrica da contribuição.</h2>
+              <p><strong>Recomendação:</strong> {builder.review.recommendation}</p>
+            </div>
+            <ul>
+              {reviewCriteria.map(([label, rating]) => (
+                <li key={label}><Check size={16} /> {label}: {rating}</li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         <section className="builder-lifecycle" aria-label="Histórico verificável da validação">
           <article>

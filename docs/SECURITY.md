@@ -20,6 +20,7 @@ Este projeto é educacional e não substitui auditoria profissional.
 - o Hardhat Keystore é local e não deve ser enviado ao repositório;
 - a senha do keystore não é a senha do MetaMask;
 - screenshots não devem incluir chave, seed phrase ou segredo revelado;
+- a prova de carteira assina apenas uma mensagem vinculada à evidência e a um nonce; ela não envia transação, não concede allowance e não deve solicitar chave privada;
 - o endereço público e o endereço do contrato podem ser documentados;
 - em caso de exposição da chave, interromper o uso da carteira e criar outra exclusivamente para testnet.
 

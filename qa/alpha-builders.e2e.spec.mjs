@@ -5,6 +5,7 @@ const require = createRequire(import.meta.url);
 const axe = require("axe-core");
 
 const ACCOUNT = "0x1111111111111111111111111111111111111111";
+const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || "http://127.0.0.1:3000";
 
 async function mockStatus(page) {
   await page.route("**/api/status", async (route) => {
@@ -18,12 +19,23 @@ async function mockStatus(page) {
           submitted: 4,
           underReview: 1,
           accepted: 2,
+          started: 4,
+          dropoffs: 2,
           approvalRate: 50,
           uniqueBuilders: 2,
           distinctProjects: 2,
           repeatBuilders: 0,
           acceptedPerBuilder: 1,
+          medianReviewHours: 12,
+          p90ReviewHours: 30,
+          feedbackCount: 2,
+          usefulRate: 100,
+          appliedRate: 50,
+          repeatIntentRate: 50,
+          willingnessToPay: 1,
         },
+        rubric: { context: { approved: 2, adjustments: 0, measured: 2 } },
+        targets: { participants: 10, submissions: 7, repeatBuilders: 5, willingnessToPay: 3, reviewSlaHours: 48 },
         builders: [],
       }),
     });
@@ -37,6 +49,7 @@ async function mockWallet(page) {
       request: async ({ method }) => {
         if (method === "eth_accounts" || method === "eth_requestAccounts") return [account];
         if (method === "eth_chainId") return "0x14a34";
+        if (method === "personal_sign") return `0x${"3".repeat(130)}`;
         if (method === "wallet_switchEthereumChain" || method === "wallet_addEthereumChain") return null;
         throw new Error(`Unexpected wallet method: ${method}`);
       },
@@ -56,7 +69,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test("home keeps critical content keyboard and WCAG accessible", async ({ page }) => {
-  await page.goto("http://127.0.0.1:3000/");
+  await page.goto(`${BASE_URL}/`);
 
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Aprenda construindo");
   await expect(page.getByText("Base Sepolia", { exact: true }).first()).toBeVisible();
@@ -83,12 +96,12 @@ test("home keeps critical content keyboard and WCAG accessible", async ({ page }
 
 test("submission accepts a public Pull Request with a testnet wallet", async ({ page }) => {
   await mockWallet(page);
-  await page.goto("http://127.0.0.1:3000/");
+  await page.goto(`${BASE_URL}/`);
 
   await page.locator("#repo-url").fill("https://github.com/Kadys-dv/ALPHA-Lab/pull/29");
   await page.locator("#wallet-address").fill(ACCOUNT);
   await page.locator(".consent-row input").check();
-  await page.getByRole("button", { name: "Preparar Issue no GitHub" }).click();
+  await page.getByRole("button", { name: "Comprovar carteira e preparar Issue" }).click();
 
   await expect(page.getByText("Etapa 1 concluída.", { exact: false })).toBeVisible();
   const opened = await page.evaluate(() => window.__alphaOpenedUrl);
@@ -97,12 +110,19 @@ test("submission accepts a public Pull Request with a testnet wallet", async ({ 
 });
 
 test("submission rejects evidence outside github.com", async ({ page }) => {
-  await page.goto("http://127.0.0.1:3000/");
+  await page.goto(`${BASE_URL}/`);
 
   await page.locator("#repo-url").fill("https://example.com/projeto");
   await page.locator("#wallet-address").fill(ACCOUNT);
   await page.locator(".consent-row input").check();
-  await page.getByRole("button", { name: "Preparar Issue no GitHub" }).click();
+  await page.getByRole("button", { name: "Comprovar carteira e preparar Issue" }).click();
 
   await expect(page.locator(".submission-form .form-error[role='alert']")).toContainText("github.com");
+});
+
+test("operations dashboard renders pilot goals and SLA", async ({ page }) => {
+  await page.goto(`${BASE_URL}/operations`);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Saúde do piloto.");
+  await expect(page.getByText("METAS 10 / 7 / 5 / 3")).toBeVisible();
+  await expect(page.getByText("P90: 30h · SLA: 48h")).toBeVisible();
 });

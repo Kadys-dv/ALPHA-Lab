@@ -1,4 +1,5 @@
 import { parseSubmission } from "@/lib/validation";
+import { acceptedAt } from "@/lib/public-status";
 
 const REPO = "Kadys-dv/ALPHA-Lab";
 
@@ -11,8 +12,31 @@ export type AcceptedBuilder = {
   issueUrl: string;
   createdAt: string;
   updatedAt: string;
+  acceptedAt: string | null;
+  review: ReviewRecord | null;
   status: "accepted";
 };
+
+export type ReviewRecord = {
+  criteria: Record<"context" | "installation" | "decisions" | "tests" | "demo", string>;
+  result: string;
+  recommendation: string;
+  reviewer: string;
+};
+
+export function parseReviewRecord(body: string | null | undefined): ReviewRecord | null {
+  const serialized = body?.match(/<!-- alpha-review-record\s*\n([\s\S]*?)\n-->/)?.[1];
+  if (!serialized) return null;
+  try {
+    const value = JSON.parse(serialized) as Partial<ReviewRecord>;
+    const keys = ["context", "installation", "decisions", "tests", "demo"] as const;
+    if (!value.criteria || keys.some((key) => typeof value.criteria?.[key] !== "string")) return null;
+    if (typeof value.result !== "string" || typeof value.recommendation !== "string" || typeof value.reviewer !== "string") return null;
+    return value as ReviewRecord;
+  } catch {
+    return null;
+  }
+}
 
 type GitHubIssue = {
   number: number;
@@ -54,6 +78,8 @@ export async function getAcceptedBuilder(issue: number): Promise<AcceptedBuilder
     issueUrl: data.html_url,
     createdAt: data.created_at,
     updatedAt: data.updated_at,
+    acceptedAt: acceptedAt(data.body),
+    review: parseReviewRecord(data.body),
     status: "accepted",
   };
 }

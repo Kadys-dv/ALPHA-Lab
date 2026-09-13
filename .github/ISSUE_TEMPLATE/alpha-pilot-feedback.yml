@@ -1,0 +1,48 @@
+name: Feedback do ciclo ALPHA Builders
+description: Registre a utilidade percebida depois da revisão.
+title: "[ALPHA Feedback] Review"
+labels: [pilot-feedback]
+body:
+  - type: input
+    id: submission
+    attributes:
+      label: Submission
+      description: Número da Issue de submissão revisada.
+      placeholder: "123"
+    validations:
+      required: true
+  - type: dropdown
+    id: useful
+    attributes:
+      label: A revisão foi útil?
+      options: [sim, parcialmente, não]
+    validations:
+      required: true
+  - type: dropdown
+    id: applied
+    attributes:
+      label: Você aplicou a recomendação principal?
+      options: [sim, ainda não, não]
+    validations:
+      required: true
+  - type: dropdown
+    id: repeat
+    attributes:
+      label: Você faria outro ciclo nas próximas quatro semanas?
+      options: [sim, talvez, não]
+    validations:
+      required: true
+  - type: dropdown
+    id: pay
+    attributes:
+      label: Você pagaria por uma revisão individual?
+      options: [sim, talvez, não]
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: O que mudou depois da revisão?
+      description: Não inclua e-mail ou dados pessoais.
+    validations:
+      required: true

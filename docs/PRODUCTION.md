@@ -21,6 +21,8 @@ Nunca versionar tokens, chaves privadas ou seed phrases.
 
 O token Cloudflare deve usar o menor conjunto de permissões necessário para publicar o Worker desta conta.
 
+Opcionalmente, configure `GITHUB_TOKEN` como segredo exclusivo do Worker para aumentar o limite das consultas públicas de métricas. O token deve ter somente leitura de Issues públicas, nunca usar o prefixo `NEXT_PUBLIC_` e jamais ser incluído no bundle do navegador.
+
 ## Deploy
 
 O deploy é automático quando mudanças em `web/**` ou no próprio workflow de deploy chegam à `main`. O modo manual por `workflow_dispatch` continua disponível e exige a confirmação explícita `deploy-alpha-builders`.

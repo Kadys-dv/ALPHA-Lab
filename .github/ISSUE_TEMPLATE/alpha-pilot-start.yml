@@ -1,0 +1,23 @@
+name: Iniciar ciclo ALPHA Builders
+description: Registre publicamente o início de um ciclo do piloto.
+title: "[ALPHA Pilot] Start"
+labels: [pilot-started]
+body:
+  - type: markdown
+    attributes:
+      value: Este registro mede início e desistência sem analytics de navegação. Não informe dados pessoais sensíveis.
+  - type: input
+    id: repository
+    attributes:
+      label: Repository
+      description: Repositório público que você pretende melhorar.
+      placeholder: https://github.com/usuario/projeto
+    validations:
+      required: true
+  - type: checkboxes
+    id: consent
+    attributes:
+      label: Consentimento
+      options:
+        - label: Entendo que este registro é público e participa das métricas agregadas do piloto.
+          required: true
