@@ -38,7 +38,7 @@ body:
     attributes:
       label: Wallet
       description: Endereço EVM público usado apenas como identificador verificável de testnet.
-      placeholder: 0x0000000000000000000000000000000000000000
+      placeholder: "0x0000000000000000000000000000000000000000"
     validations:
       required: true
   - type: input

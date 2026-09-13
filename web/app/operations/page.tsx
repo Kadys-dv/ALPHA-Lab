@@ -19,13 +19,13 @@ export default function OperationsPage() {
 
   return <main className="builder-profile-page" id="main-content"><div className="builder-profile-shell">
     <Link className="builder-back-link" href="/"><ArrowLeft size={16}/> Voltar ao ALPHA Builders</Link>
-    <div className="builder-profile-hero"><p>OPERACAO / TELEMETRIA PUBLICA</p><h1>Saude do piloto.</h1><span>Dados publicos do GitHub, formulas explicitas e ausencia representada por -.</span></div>
+    <div className="builder-profile-hero"><p>OPERACAO / TELEMETRIA PUBLICA</p><h1>Saúde do piloto.</h1><span>Dados publicos do GitHub, formulas explicitas e ausencia representada por -.</span></div>
     <div className="builder-profile-grid operations-grid">
       <article><small><Activity size={14}/> FONTE</small><strong>{status.state}</strong><span>{status.source ? `${status.source.healthySources}/${status.source.totalSources} fontes saudaveis` : "Aguardando consulta"}</span></article>
       <article><small><Users size={14}/> INICIARAM</small><strong>{value(status.metrics.started)}</strong><span>Meta: {targets?.participants ?? 10}</span></article>
       <article><small><Workflow size={14}/> CONCLUSAO</small><strong>{value(status.metrics.completionRate, "%")}</strong><span>{value(status.metrics.dropoffs)} desistencias observadas</span></article>
       <article><small><Target size={14}/> ACEITE</small><strong>{value(status.metrics.approvalRate, "%")}</strong><span>{value(status.metrics.accepted)} de {value(status.metrics.submitted)} submissoes</span></article>
-      <article><small><Clock3 size={14}/> MEDIANA</small><strong>{value(status.metrics.medianReviewHours, "h")}</strong><span>P90: {value(status.metrics.p90ReviewHours, "h")} / SLA: {targets?.reviewSlaHours ?? 48}h</span></article>
+      <article><small><Clock3 size={14}/> MEDIANA</small><strong>{value(status.metrics.medianReviewHours, "h")}</strong><span>P90: {value(status.metrics.p90ReviewHours, "h")} · SLA: {targets?.reviewSlaHours ?? 48}h</span></article>
       <article><small><MessageSquareText size={14}/> FEEDBACK</small><strong>{value(status.metrics.usefulRate, "%")}</strong><span>{value(status.metrics.privateFeedbackRequests)} pediram retorno privado</span></article>
       <article><small><Workflow size={14}/> APLICACAO</small><strong>{value(status.metrics.appliedRate, "%")}</strong><span>aplicaram a recomendacao principal</span></article>
       <article><small><Users size={14}/> REPETICAO</small><strong>{value(status.metrics.repeatIntentRate, "%")}</strong><span>declararam intencao de repetir</span></article>
