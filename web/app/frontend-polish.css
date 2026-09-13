@@ -1,3 +1,91 @@
+html,
+body {
+  overflow-x: clip;
+}
+
+:root {
+  --surface-elevated: rgba(20, 20, 27, 0.88);
+  --focus-ring: 0 0 0 3px rgba(34, 211, 238, 0.24);
+}
+
+.site-header {
+  padding-block: 0.7rem;
+  background: rgba(9, 9, 11, 0.88);
+}
+
+.hero-latest {
+  position: relative;
+  isolation: isolate;
+}
+
+.hero-latest::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: min(48vw, 620px);
+  height: min(48vw, 620px);
+  top: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.16), transparent 68%);
+  pointer-events: none;
+}
+
+.hero-copy h1 {
+  max-width: 850px;
+  text-wrap: balance;
+}
+
+.hero-lead {
+  max-width: 640px;
+  text-wrap: balance;
+}
+
+.neo-button {
+  border-radius: 5px;
+}
+
+.neo-button:focus-visible,
+.mobile-menu-button:focus-visible,
+.mobile-nav a:focus-visible {
+  box-shadow: var(--focus-ring);
+}
+
+.visual-frame,
+.purpose-panel,
+.task-panel,
+.submission-form {
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.24);
+}
+
+.flow-card,
+.proof-card,
+.builder-card,
+.metric-card {
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.flow-card:hover,
+.proof-card:hover,
+.builder-card:hover,
+.metric-card:hover {
+  border-color: rgba(103, 232, 249, 0.38);
+}
+
+.metrics-grid {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.metric-card strong {
+  color: #f7f5f1;
+}
+
+.sticky-pilot {
+  border-radius: 8px;
+}
+
 .mobile-menu-button {
   display: none;
   border: 1px solid var(--line-strong);
@@ -46,5 +134,33 @@
   .mobile-nav a:hover,
   .mobile-nav a:focus-visible {
     color: var(--aqua);
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-latest {
+    min-height: auto;
+    padding-top: 3.5rem;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(3rem, 15vw, 4.8rem);
+  }
+
+  .hero-actions {
+    width: 100%;
+  }
+
+  .hero-actions .neo-button {
+    flex: 1 1 100%;
+  }
+
+  .sticky-pilot {
+    width: calc(100vw - 1rem);
+    padding: 0.7rem;
+  }
+
+  .sticky-pilot strong {
+    font-size: 0.76rem;
   }
 }
