@@ -46,7 +46,7 @@ Contrato validado: `0xff15343aCcc4B77479EBE3C4cae32d99d4c60f48`.
 - [x] tratamento de carteira ausente, rede incorreta e cancelamento
 - [x] avisos de testnet e ausência de valor financeiro
 
-Site atual: https://alpha-builders.kadys-v2.chatgpt.site
+Site atual: https://alpha-builders-web.cskadys.workers.dev
 
 ## Fase 5.1 — fonte de verdade e qualidade: implementada
 
@@ -56,8 +56,8 @@ Site atual: https://alpha-builders.kadys-v2.chatgpt.site
 - [x] adicionar smoke test do deploy público
 - [x] adicionar endpoint `/api/version` para SHA de deploy
 - [x] documentar limitação de rastreabilidade do host atual
-- [ ] versionar `web/package-lock.json` gerado e validado pelo CI
-- [ ] migrar o deploy futuro para uma hospedagem diretamente ligada ao repositório/commit
+- [x] versionar `web/package-lock.json` gerado e validado pelo CI
+- [x] migrar o deploy para uma hospedagem diretamente ligada ao repositório/commit
 
 ## Fase 6 — pipeline de contribuições: implementada tecnicamente
 
@@ -83,6 +83,8 @@ Site atual: https://alpha-builders.kadys-v2.chatgpt.site
 - [ ] medir qualidade percebida da revisão de README
 - [ ] validar repetição de uso por pelo menos 5 usuários
 - [ ] decidir, com dados, se é necessário backend próprio
+
+Plano operacional: [PILOT.md](PILOT.md).
 
 ## Fase 7 — primeira receita
 

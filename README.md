@@ -110,6 +110,8 @@ npm run build:vinext
 - [Cloudflare Workers](docs/CLOUDFLARE.md)
 - [Produção](docs/PRODUCTION.md)
 - [Métricas](docs/METRICS.md)
+- [Execução do piloto](docs/PILOT.md)
+- [Rubrica de revisão](docs/REVIEW-RUBRIC.md)
 - [Hipótese de produto ALPHA Builders](docs/PRODUCT.md)
 - [Roadmap de validação](docs/ROADMAP.md)
 - [Política de segurança](docs/SECURITY.md)

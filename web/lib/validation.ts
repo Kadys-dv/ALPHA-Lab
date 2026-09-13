@@ -2,12 +2,16 @@ export type Submission = {
   repoUrl: string;
   evidenceUrl: string;
   wallet: string;
+  nonce?: string;
+  signature?: string;
 };
 
 type SubmissionInput = {
   repoUrl?: string;
   evidenceUrl?: string;
   wallet: string;
+  nonce: string;
+  signature: string;
 };
 
 const SEGMENT = /^[A-Za-z0-9_.-]+$/;
@@ -46,10 +50,16 @@ export function isEvmAddress(input: string): boolean {
   return /^0x[a-fA-F0-9]{40}$/.test(input.trim());
 }
 
-export function buildIssueUrl({ repoUrl, evidenceUrl, wallet }: SubmissionInput): string {
+export function buildWalletProofMessage(evidenceUrl: string, wallet: string, nonce: string): string {
+  const evidence = normalizeGitHubEvidenceUrl(evidenceUrl);
+  if (!evidence || !isEvmAddress(wallet) || !/^0x[a-fA-F0-9]{64}$/.test(nonce)) throw new Error("Invalid wallet proof");
+  return `ALPHA Builders wallet proof\nEvidence: ${evidence}\nWallet: ${wallet.toLowerCase()}\nNonce: ${nonce}`;
+}
+
+export function buildIssueUrl({ repoUrl, evidenceUrl, wallet, nonce, signature }: SubmissionInput): string {
   const safeEvidence = normalizeGitHubEvidenceUrl(evidenceUrl ?? repoUrl ?? "");
   const safeRepo = safeEvidence ? normalizeGitHubRepoUrl(safeEvidence) : null;
-  if (!safeRepo || !safeEvidence || !isEvmAddress(wallet)) throw new Error("Invalid submission");
+  if (!safeRepo || !safeEvidence || !isEvmAddress(wallet) || !/^0x[a-fA-F0-9]{64}$/.test(nonce) || !/^0x[a-fA-F0-9]{130}$/.test(signature)) throw new Error("Invalid submission");
 
   const title = "[ALPHA Builders] README review submission";
   const body = [
@@ -58,6 +68,8 @@ export function buildIssueUrl({ repoUrl, evidenceUrl, wallet }: SubmissionInput)
     `Repository: ${safeRepo}`,
     `Evidence: ${safeEvidence}`,
     `Wallet: ${wallet.trim()}`,
+    `Nonce: ${nonce}`,
+    `Signature: ${signature}`,
     "",
     "Status: submitted",
     "",
@@ -75,6 +87,8 @@ export function parseSubmission(body: string): Submission | null {
   const wallet =
     body.match(/^Wallet:\s*(0x[a-fA-F0-9]{40})\s*$/im)?.[1] ??
     body.match(/### Wallet\s+\n\s*(0x[a-fA-F0-9]{40})/im)?.[1];
+  const nonce = body.match(/^Nonce:\s*(0x[a-fA-F0-9]{64})\s*$/im)?.[1] ?? body.match(/### Nonce\s+\n\s*(0x[a-fA-F0-9]{64})/im)?.[1];
+  const signature = body.match(/^Signature:\s*(0x[a-fA-F0-9]{130})\s*$/im)?.[1] ?? body.match(/### Signature\s+\n\s*(0x[a-fA-F0-9]{130})/im)?.[1];
 
   if (!repo || !wallet) return null;
 
@@ -83,5 +97,5 @@ export function parseSubmission(body: string): Submission | null {
   if (!normalizedRepo || !normalizedEvidence || !isEvmAddress(wallet)) return null;
   if (normalizeGitHubRepoUrl(normalizedEvidence) !== normalizedRepo) return null;
 
-  return { repoUrl: normalizedRepo, evidenceUrl: normalizedEvidence, wallet };
+  return { repoUrl: normalizedRepo, evidenceUrl: normalizedEvidence, wallet, nonce, signature };
 }

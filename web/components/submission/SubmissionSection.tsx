@@ -2,12 +2,13 @@
 
 import { ArrowUpRight, Wallet } from "lucide-react";
 import { FormEvent, useState } from "react";
-import { buildIssueUrl, isEvmAddress, normalizeGitHubEvidenceUrl } from "@/lib/validation";
+import { buildIssueUrl, buildWalletProofMessage, isEvmAddress, normalizeGitHubEvidenceUrl } from "@/lib/validation";
 
 type Props = {
   account: string;
   onCorrectNetwork: boolean;
   connect: () => Promise<void>;
+  signMessage: (message: string) => Promise<string>;
   exampleBuilderIssue?: number;
 };
 
@@ -18,6 +19,7 @@ export default function SubmissionSection({
   account,
   onCorrectNetwork,
   connect,
+  signMessage,
   exampleBuilderIssue,
 }: Props) {
   const [repoUrl, setRepoUrl] = useState("");
@@ -25,10 +27,10 @@ export default function SubmissionSection({
   const [walletTouched, setWalletTouched] = useState(false);
   const [consent, setConsent] = useState(false);
   const [formError, setFormError] = useState("");
-  const [formState, setFormState] = useState<"idle" | "ready">("idle");
+  const [formState, setFormState] = useState<"idle" | "signing" | "ready">("idle");
   const submissionWallet = walletTouched ? wallet : account;
 
-  const submit = (event: FormEvent) => {
+  const submit = async (event: FormEvent) => {
     event.preventDefault();
     setFormError("");
     setFormState("idle");
@@ -42,17 +44,29 @@ export default function SubmissionSection({
       setFormError("Informe um endereço EVM público válido.");
       return;
     }
+    if (!account || account.toLowerCase() !== submissionWallet.trim().toLowerCase()) {
+      setFormError("Conecte a carteira informada para comprovar que você controla o endereço.");
+      return;
+    }
+    if (!onCorrectNetwork) {
+      setFormError("Confirme a Base Sepolia antes de assinar a prova da carteira.");
+      return;
+    }
     if (!consent) {
       setFormError("Confirme que você entende que o piloto usa somente testnet.");
       return;
     }
 
-    setFormState("ready");
-    window.open(
-      buildIssueUrl({ evidenceUrl, wallet: submissionWallet }),
-      "_blank",
-      "noopener,noreferrer",
-    );
+    try {
+      setFormState("signing");
+      const bytes = crypto.getRandomValues(new Uint8Array(32));
+      const nonce = `0x${Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("")}`;
+      const signature = await signMessage(buildWalletProofMessage(evidenceUrl, submissionWallet, nonce));
+      window.open(buildIssueUrl({ evidenceUrl, wallet: submissionWallet, nonce, signature }), "_blank", "noopener,noreferrer");
+      setFormState("ready");
+    } catch {
+      setFormState("idle");
+    }
   };
 
   return (
@@ -139,10 +153,11 @@ export default function SubmissionSection({
               Etapa 1 concluída. A Issue foi preparada; revise o conteúdo no GitHub antes de publicar.
             </p>
           )}
+          {formState === "signing" && <p className="form-success">Confirme a assinatura da mensagem na carteira. Nenhuma transação será enviada.</p>}
         </div>
 
-        <button className="neo-button primary wide" type="submit">
-          Preparar Issue no GitHub <ArrowUpRight size={18} />
+        <button className="neo-button primary wide" type="submit" disabled={formState === "signing"}>
+          {formState === "signing" ? "Aguardando assinatura" : "Comprovar carteira e preparar Issue"} <ArrowUpRight size={18} />
         </button>
         <small className="privacy-copy">
           Nunca envie seed phrase, chave privada ou dados pessoais sensíveis.

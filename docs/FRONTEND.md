@@ -218,7 +218,7 @@ O frontend não habilita:
 - transferência de ativos;
 - `approve` ou `permit`;
 - swap, bridge ou staking;
-- assinatura de mensagens ou transações financeiras;
+- assinatura financeira ou transação; a única assinatura de mensagem permitida comprova controle da carteira e não concede permissão;
 - promessa de preço, lucro, rendimento ou valorização.
 
 ## Rastreabilidade

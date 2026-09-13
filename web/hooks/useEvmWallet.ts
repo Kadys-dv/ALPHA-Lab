@@ -119,8 +119,19 @@ export function useEvmWallet() {
     }
   }, [provider, sync]);
 
+  const signMessage = useCallback(async (message: string) => {
+    setError("");
+    if (!provider || !account) throw new Error("wallet_not_connected");
+    try {
+      return String(await provider.request({ method: "personal_sign", params: [message, account] }));
+    } catch (walletError) {
+      setError(errorCode(walletError) === "4001" ? "Assinatura cancelada na carteira." : "Não foi possível comprovar o controle da carteira.");
+      throw walletError;
+    }
+  }, [account, provider]);
+
   return useMemo(
-    () => ({ account, chain, error, onCorrectNetwork, connect }),
-    [account, chain, error, onCorrectNetwork, connect],
+    () => ({ account, chain, error, onCorrectNetwork, connect, signMessage }),
+    [account, chain, error, onCorrectNetwork, connect, signMessage],
   );
 }
