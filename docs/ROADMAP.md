@@ -68,6 +68,11 @@ Site atual: https://alpha-builders-web.cskadys.workers.dev
 - [x] exibir estado degradado e idade do snapshot na tela de operações
 - [x] limitar abuso local do endpoint de prova e rejeitar payloads excessivos
 - [x] declarar limites das listas públicas de builders, coorte e fila
+- [x] monitorar dependências npm de contrato, frontend e QA com Dependabot
+- [x] monitorar atualizações de GitHub Actions com Dependabot
+- [x] executar análise CodeQL para JavaScript/TypeScript
+- [x] fixar Actions de CI nos SHAs verificados dos releases usados
+- [ ] habilitar secret scanning e push protection nas configurações do repositório
 
 ## Fase 6 — pipeline de contribuições: implementada tecnicamente
 

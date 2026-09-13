@@ -16,3 +16,10 @@ Do not publish exploitable vulnerabilities or secrets in public issues. Report s
 Detailed operational guidance is maintained in `docs/SECURITY.md`.
 
 Changes involving the ERC-20 contract, wallet connection, submission validation or deployment infrastructure require tests and explicit security-impact review.
+
+## Supply chain and CI
+
+- Dependabot monitors npm dependencies in `/`, `/web` and `/qa`, plus GitHub Actions.
+- CI workflows declare read-only permissions by default, use bounded concurrency and timeouts where applicable, and pin third-party Actions to the verified commit for their documented release tag.
+- CodeQL runs on JavaScript/TypeScript pull requests, pushes to `main`, and weekly.
+- GitHub secret scanning is not enabled by a workflow in this repository. It must be enabled in the repository Security settings (including push protection where available); enabling that setting remains an operational follow-up.
