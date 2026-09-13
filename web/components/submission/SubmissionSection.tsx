@@ -59,14 +59,26 @@ export default function SubmissionSection({
 
     try {
       setFormState("signing");
-      const bytes = crypto.getRandomValues(new Uint8Array(32));
-      const nonce = `0x${Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("")}`;
       const cycleId = buildCycleId(crypto.getRandomValues(new Uint8Array(8)));
-      const proofCreatedAt = new Date().toISOString();
+      const nonceResponse = await fetch("/api/wallet-proof", { cache: "no-store" });
+      if (!nonceResponse.ok) throw new Error("nonce_unavailable");
+      const { nonce, createdAt: proofCreatedAt, requestId } = await nonceResponse.json() as {
+        nonce?: string;
+        createdAt?: string;
+        requestId?: string;
+      };
+      if (!nonce || !proofCreatedAt || !requestId) throw new Error("invalid_nonce");
       const signature = await signMessage(buildWalletProofMessage(evidenceUrl, submissionWallet, nonce, proofCreatedAt));
+      const verification = await fetch("/api/wallet-proof", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Request-Id": requestId },
+        body: JSON.stringify({ evidenceUrl, wallet: submissionWallet, nonce, proofCreatedAt, signature }),
+      });
+      if (!verification.ok) throw new Error("proof_rejected");
       window.open(buildIssueUrl({ evidenceUrl, wallet: submissionWallet, cycleId, nonce, proofCreatedAt, signature }), "_blank", "noopener,noreferrer");
       setFormState("ready");
     } catch {
+      setFormError("Não foi possível validar a prova da carteira. Tente novamente.");
       setFormState("idle");
     }
   };

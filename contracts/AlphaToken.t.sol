@@ -67,6 +67,27 @@ contract AlphaTokenTest {
         require(token.totalSupply() == supplyBefore, "transfer must not change supply");
     }
 
+    function test_RepeatedTransfersPreserveSupplyAndBalances() public {
+        uint256 amount = 10 * 10 ** 18;
+        uint256 supplyBefore = token.totalSupply();
+        require(token.transfer(address(receiver), amount), "first transfer should succeed");
+        require(token.transfer(address(receiver), amount), "second transfer should succeed");
+        require(
+            token.balanceOf(address(receiver)) == amount * 2,
+            "receiver should accumulate transfers"
+        );
+        require(token.balanceOf(address(this)) == supplyBefore - amount * 2, "sender balance mismatch");
+        require(token.totalSupply() == supplyBefore, "repeated transfers must not change supply");
+    }
+
+    function test_ApprovalEventStateAndSupplyInvariant() public {
+        uint256 approved = 25 * 10 ** 18;
+        uint256 supplyBefore = token.totalSupply();
+        require(token.approve(address(spender), approved), "approve should succeed");
+        require(token.allowance(address(this), address(spender)) == approved, "approval state mismatch");
+        require(token.totalSupply() == supplyBefore, "approval must not change supply");
+    }
+
     function test_ApproveAndTransferFromWork() public {
         uint256 approved = 100 * 10 ** 18;
         uint256 spent = 40 * 10 ** 18;

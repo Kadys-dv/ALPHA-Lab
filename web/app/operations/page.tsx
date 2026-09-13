@@ -16,10 +16,17 @@ export default function OperationsPage() {
   const status = usePublicStatus();
   const targets = status.targets;
   const gaps = Object.entries(status.rubric ?? {}).filter(([, count]) => count.measured > 0).sort(([, a], [, b]) => b.adjustments - a.adjustments);
+  const degraded = status.state === "partial" || status.state === "unavailable";
+  const snapshotAge = status.snapshot?.freshness.ageSeconds;
 
   return <main className="builder-profile-page" id="main-content"><div className="builder-profile-shell">
     <Link className="builder-back-link" href="/"><ArrowLeft size={16}/> Voltar ao ALPHA Builders</Link>
     <div className="builder-profile-hero"><p>OPERACAO / TELEMETRIA PUBLICA</p><h1>Saúde do piloto.</h1><span>Dados publicos do GitHub, formulas explicitas e ausencia representada por -.</span></div>
+    {degraded && <p className="metrics-health metrics-health-warning" role="status">
+      {status.snapshot
+        ? `Exibindo dados degradados; snapshot de ${snapshotAge ?? 0} segundos atrás.`
+        : "Fontes externas indisponíveis; nenhum dado ausente foi substituído por zero."}
+    </p>}
     <div className="builder-profile-grid operations-grid">
       <article><small><Activity size={14}/> FONTE</small><strong>{status.state}</strong><span>{status.source ? `${status.source.healthySources}/${status.source.totalSources} fontes saudaveis` : "Aguardando consulta"}</span></article>
       <article><small><Users size={14}/> INICIARAM</small><strong>{value(status.metrics.started)}</strong><span>Meta: {targets?.participants ?? 10}</span></article>

@@ -5,7 +5,12 @@ on:
     types: [opened, edited, reopened]
 
 permissions:
+  contents: read
   issues: write
+
+concurrency:
+  group: alpha-pilot-${{ github.event.issue.number || github.run_id }}
+  cancel-in-progress: true
 
 jobs:
   label:

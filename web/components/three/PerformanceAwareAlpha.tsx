@@ -60,5 +60,7 @@ export default function PerformanceAwareAlpha() {
     };
   }, []);
 
-  return allow3d ? <FloatingAlpha /> : <div className="alpha-orb-fallback" aria-hidden="true" />;
+  return allow3d ? <FloatingAlpha /> : (
+    <div className="alpha-orb-fallback" role="img" aria-label="ALPHA visual placeholder" />
+  );
 }

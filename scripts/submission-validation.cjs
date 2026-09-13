@@ -1,3 +1,4 @@
+const contract = require("../web/lib/submission-contract.json");
 const LABELS = {
   submission: ["1d76db", "ALPHA Builders public submission"],
   "under-review": ["fbca04", "Waiting for human review"],
@@ -42,11 +43,11 @@ function field(body, name, pattern) {
 function parseSubmission(body) {
   const repository = field(body, "Repository", "https:\\/\\/github\\.com\\/[^\\s/]+\\/[^\\s/]+");
   const evidence = field(body, "Evidence", "https:\\/\\/github\\.com\\/\\S+") ?? repository;
-  const wallet = field(body, "Wallet", "0x[a-fA-F0-9]{40}");
-  const cycleId = field(body, "Cycle ID", "alpha-[0-9a-f]{12}");
-  const nonce = field(body, "Nonce", "0x[a-fA-F0-9]{64}");
+  const wallet = field(body, "Wallet", contract.walletPattern.slice(1, -1));
+  const cycleId = field(body, "Cycle ID", contract.cycleIdPattern.slice(1, -1));
+  const nonce = field(body, "Nonce", contract.noncePattern.slice(1, -1));
   const proofCreatedAt = field(body, "Proof Created At", "[^\\n]+");
-  const signature = field(body, "Signature", "0x[a-fA-F0-9]{130}");
+  const signature = field(body, "Signature", contract.signaturePattern.slice(1, -1));
   if (!repository || !evidence || !wallet || !nonce || !signature) return null;
 
   try {
@@ -83,6 +84,13 @@ async function setState(github, context, issueNumber, state) {
     accepted: ["submission", "valid", "accepted"],
   };
   await github.rest.issues.setLabels({ ...context.repo, issue_number: issueNumber, labels: states[state] });
+}
+
+async function commentOnce(github, context, issueNumber, key, body) {
+  const comments = await github.paginate(github.rest.issues.listComments, { ...context.repo, issue_number: issueNumber, per_page: 100 });
+  const marker = `<!-- alpha-validation:${key} -->`;
+  if (comments.some((comment) => comment.body?.includes(marker))) return;
+  await github.rest.issues.createComment({ ...context.repo, issue_number: issueNumber, body: `${marker}\n${body}` });
 }
 
 async function ensureLabels(github, context) {
@@ -128,7 +136,7 @@ async function markAccepted({ github, context, issue, recordAcceptance, review }
   await github.rest.issues.update({ ...context.repo, issue_number: issue.number, body });
   const feedbackTitle = encodeURIComponent(`[ALPHA Feedback] Review #${issue.number}`);
   const feedbackUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/issues/new?template=alpha-pilot-feedback.yml&title=${feedbackTitle}`;
-  await github.rest.issues.createComment({ ...context.repo, issue_number: issue.number, body: `Contribuição aceita. Registre o resultado do ciclo no [formulário de feedback associado à Issue #${issue.number}](${feedbackUrl}).` });
+  await commentOnce(github, context, issue.number, "accepted-feedback", `Contribuição aceita. Registre o resultado do ciclo no [formulário de feedback associado à Issue #${issue.number}](${feedbackUrl}).`);
 }
 
 async function validateSubmission({ github, context, core, verifyWalletProof }) {
@@ -144,13 +152,13 @@ async function validateSubmission({ github, context, core, verifyWalletProof }) 
     }
     if (!labels.includes("valid")) {
       await setState(github, context, issue.number, "needsReview");
-      await github.rest.issues.createComment({ ...context.repo, issue_number: issue.number, body: "O aceite foi removido porque a submissão ainda não possui validação técnica `valid`. Corrija a evidência e a prova de carteira antes da decisão humana." });
+      await commentOnce(github, context, issue.number, "accepted-without-valid", "O aceite foi removido porque a submissão ainda não possui validação técnica `valid`. Corrija a evidência e a prova de carteira antes da decisão humana.");
       return;
     }
     const review = await findReview(github, context, issue.number);
     if (!review || review.result !== "aprovado") {
       await setState(github, context, issue.number, "review");
-      await github.rest.issues.createComment({ ...context.repo, issue_number: issue.number, body: "O aceite foi removido: publique antes uma rubrica completa, com resultado `aprovado`, usando o modelo de `docs/REVIEW-RUBRIC.md`. A revisão deve ser feita por owner, member ou collaborator." });
+      await commentOnce(github, context, issue.number, "accepted-without-review", "O aceite foi removido: publique antes uma rubrica completa, com resultado `aprovado`, usando o modelo de `docs/REVIEW-RUBRIC.md`. A revisão deve ser feita por owner, member ou collaborator.");
       return;
     }
     await markAccepted({ github, context, issue, recordAcceptance, review });
@@ -161,7 +169,7 @@ async function validateSubmission({ github, context, core, verifyWalletProof }) 
   const submission = parseSubmission(issue.body ?? "");
   if (!submission) {
     await setState(github, context, issue.number, "invalid");
-    await github.rest.issues.createComment({ ...context.repo, issue_number: issue.number, body: "Validação automática: informe repositório, evidência GitHub e endereço EVM válidos. A evidência deve pertencer ao repositório informado." });
+    await commentOnce(github, context, issue.number, "invalid-format", "Validação automática: informe repositório, evidência GitHub e endereço EVM válidos. A evidência deve pertencer ao repositório informado.");
     return;
   }
 
@@ -188,7 +196,7 @@ async function validateSubmission({ github, context, core, verifyWalletProof }) 
     } catch (error) {
       if (error.status !== 404) throw error;
       await setState(github, context, issue.number, "needsReview");
-      await github.rest.issues.createComment({ ...context.repo, issue_number: issue.number, body: "Repositório público encontrado, mas nenhum README foi localizado. Revisão humana necessária." });
+      await commentOnce(github, context, issue.number, "missing-readme", "Repositório público encontrado, mas nenhum README foi localizado. Revisão humana necessária.");
       return;
     }
 
@@ -202,17 +210,17 @@ async function validateSubmission({ github, context, core, verifyWalletProof }) 
       const files = await github.paginate(github.rest.pulls.listFiles, { owner, repo, pull_number: pullNumber, per_page: 100 });
       if (!files.some((file) => /(^|\/)readme(?:\.[^/]+)?$/i.test(file.filename))) {
         await setState(github, context, issue.number, "needsReview");
-        await github.rest.issues.createComment({ ...context.repo, issue_number: issue.number, body: "O Pull Request existe e pertence ao repositório, mas não altera um arquivo README. Revisão humana necessária." });
+        await commentOnce(github, context, issue.number, "missing-readme-change", "O Pull Request existe e pertence ao repositório, mas não altera um arquivo README. Revisão humana necessária.");
         return;
       }
     }
 
     await setState(github, context, issue.number, "review");
-    await github.rest.issues.createComment({ ...context.repo, issue_number: issue.number, body: "Validação técnica concluída: repositório público, README presente, evidência pertencente ao projeto e carteira EVM em formato válido. A aceitação final continua sendo humana." });
+    await commentOnce(github, context, issue.number, "technical-valid", "Validação técnica concluída: repositório público, README presente, evidência pertencente ao projeto e carteira EVM em formato válido. A aceitação final continua sendo humana.");
   } catch (error) {
     core.warning(error.message);
     await setState(github, context, issue.number, error.status === 404 ? "invalid" : "needsReview");
-    await github.rest.issues.createComment({ ...context.repo, issue_number: issue.number, body: "Não foi possível validar integralmente o repositório ou a evidência. Verifique os links; falhas temporárias seguem para revisão humana." });
+    await commentOnce(github, context, issue.number, "validation-error", "Não foi possível validar integralmente o repositório ou a evidência. Verifique os links; falhas temporárias seguem para revisão humana.");
   }
 }
 

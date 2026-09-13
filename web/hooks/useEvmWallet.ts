@@ -20,6 +20,12 @@ const errorCode = (error: unknown) =>
     ? String((error as { code?: unknown }).code)
     : "";
 
+const walletErrorMessage = (error: unknown, fallback: string) =>
+  errorCode(error) === "4001" ? "Operação cancelada na carteira." : fallback;
+
+const accountsFrom = (value: unknown): string[] =>
+  Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
+
 export function useEvmWallet() {
   const [account, setAccount] = useState("");
   const [chain, setChain] = useState("");
@@ -34,7 +40,7 @@ export function useEvmWallet() {
       provider.request({ method: "eth_accounts" }),
       provider.request({ method: "eth_chainId" }),
     ]);
-    const list = accounts as string[];
+    const list = accountsFrom(accounts);
     setAccount(list[0] ?? "");
     setChain(String(currentChain));
   }, [provider]);
@@ -49,11 +55,13 @@ export function useEvmWallet() {
     ])
       .then(([accounts, currentChain]) => {
         if (!active) return;
-        const list = accounts as string[];
+        const list = accountsFrom(accounts);
         setAccount(list[0] ?? "");
         setChain(String(currentChain));
       })
-      .catch(() => undefined);
+      .catch((walletError: unknown) => {
+        if (active) setError(walletErrorMessage(walletError, "Não foi possível ler o estado da carteira."));
+      });
 
     const onAccountsChanged = (value: unknown) => {
       const nextAccount = Array.isArray(value) ? String(value[0] ?? "") : "";
@@ -111,11 +119,7 @@ export function useEvmWallet() {
       }
       await sync();
     } catch (walletError) {
-      setError(
-        errorCode(walletError) === "4001"
-          ? "Conexão cancelada na carteira."
-          : "Não foi possível conectar ou configurar a carteira.",
-      );
+      setError(walletErrorMessage(walletError, "Não foi possível conectar ou configurar a carteira."));
     }
   }, [provider, sync]);
 
@@ -125,7 +129,7 @@ export function useEvmWallet() {
     try {
       return String(await provider.request({ method: "personal_sign", params: [message, account] }));
     } catch (walletError) {
-      setError(errorCode(walletError) === "4001" ? "Assinatura cancelada na carteira." : "Não foi possível comprovar o controle da carteira.");
+      setError(walletErrorMessage(walletError, "Não foi possível comprovar o controle da carteira."));
       throw walletError;
     }
   }, [account, provider]);

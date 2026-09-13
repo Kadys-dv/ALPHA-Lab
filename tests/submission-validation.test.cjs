@@ -45,6 +45,19 @@ describe("submission workflow", () => {
     assert.deepEqual(h.calls.labels.at(-1), ["submission", "valid", "under-review"]);
   });
 
+  it("does not duplicate validation comments on a replayed event", async () => {
+    const h = harness();
+    const originalPaginate = h.github.paginate;
+    h.github.paginate = async (method, options) => {
+      if (method === h.github.rest.issues.listComments && options?.issue_number === 1) {
+        return [{ body: "<!-- alpha-validation:technical-valid -->" }];
+      }
+      return originalPaginate(method, options);
+    };
+    await validateSubmission(h);
+    assert.equal(h.calls.comments.length, 0);
+  });
+
   it("rejects a wallet signature that does not recover the declared address", async () => {
     const h = harness();
     h.verifyWalletProof = async () => false;

@@ -42,7 +42,12 @@ export async function fetchIssuesByLabel(
         signal: AbortSignal.timeout(8_000),
       });
       if (!response.ok) return { ok: false, items: [], error: `github_${response.status}` };
-      const pageItems = (await response.json()) as GitHubIssue[];
+      const payload: unknown = await response.json();
+      if (!Array.isArray(payload)) return { ok: false, items: [], error: "github_invalid_payload" };
+      const pageItems = payload.filter((item): item is GitHubIssue =>
+        typeof item === "object" && item !== null &&
+        typeof (item as { number?: unknown }).number === "number",
+      );
       items.push(...pageItems.filter((issue) => !issue.pull_request));
       if (pageItems.length < 100) break;
     }
